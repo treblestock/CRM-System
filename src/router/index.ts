@@ -7,7 +7,7 @@ const routes = [
     path: '/',
     name: 'main',
     props: true,
-    component: () => import('~/pages/main.vue'),
+    component: () => import('~/pages/TodoListPage.vue'),
     children: [
       
     ],

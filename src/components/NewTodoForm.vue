@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { TodoRequest } from '~/types';
+import api from '~/api';
 import { isValidTodoTitle } from '~/utils';
 
-
-
-const emit = defineEmits<{
-  newTodo: [todo: Required<TodoRequest>]
+const props = defineProps<{
+  updateTodoList(...args: any): void
 }>()
+
 
 
 const title = ref<string>('')
@@ -15,15 +14,26 @@ const title = ref<string>('')
 
 const wasValidationFailed = ref(false)
 
-function onSubmit() {
+async function onSubmit() {
   if (!isValidTodoTitle(title.value)) {
     wasValidationFailed.value = true
     return
   }
 
-  emit('newTodo', {title: title.value, isDone: false})
-  title.value = ''
-  wasValidationFailed.value = false
+  try {
+    const resp = await api.createTodo({
+      title: title.value,
+      isDone: false,
+    })
+    if (!resp) return
+
+    title.value = ''
+    wasValidationFailed.value = false
+
+    props.updateTodoList()
+  } catch(err) {
+    console.log('err: ', err)
+  }
 }
 
 

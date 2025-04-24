@@ -1,25 +1,14 @@
 <script setup lang="ts">
-import type { Todo, TodoRequest } from '~/types';
+import type { Todo } from '~/types';
 import TodoItem from './TodoItem.vue';
 
 
 
 const props = defineProps<{
   todos: Todo[]
+  updateTodoList(...args: any): void
 }>()
 
-
-const emit = defineEmits<{
-  updateTodo: [id: Todo['id'], todoPatch: TodoRequest]
-  deleteTodo: [id: Todo['id']]
-}>()
-
-function updateTodo(id: Todo['id'], todoPatch: TodoRequest) {
-  emit('updateTodo', id, todoPatch)
-}
-function deleteTodo(id: Todo['id']) {
-  emit('deleteTodo', id)
-}
 
 
 </script>
@@ -29,8 +18,8 @@ function deleteTodo(id: Todo['id']) {
     <TodoItem class="todo-item"
       v-for="todo in props.todos" :key="todo.id" 
       :="todo"
-      @update="updateTodo"
-      @delete="deleteTodo"
+      :updateTodoList="updateTodoList"
+
     ></TodoItem>
   </div>
 </template>

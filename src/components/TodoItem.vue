@@ -5,15 +5,13 @@ import IconCancel from './icons/IconCancel.vue';
 import IconSave from './icons/IconSave.vue';
 import IconEdit from './icons/IconEdit.vue';
 import IconDelete from './icons/IconDelete.vue';
+import api from '~/api';
+import { isValidTodoTitle } from '~/utils';
 
 
-const props = defineProps<Todo>()
-
-const emit = defineEmits<{
-  update: [id: Todo['id'], todoPatch: TodoRequest]
-  delete: [id: Todo['id']],
+const props = defineProps<Todo & {
+  updateTodoList(...args: any): void
 }>()
-
 
 const isEditingMode = ref(false)
 const HTMLNewTitleInput = useTemplateRef('HTMLNewTitle')
@@ -26,19 +24,35 @@ function startTodoEditing() {
 }
 
 function saveTodoTitle() {
-  emit('update', props.id, {
-    title: newTitle.value,
+  updateTodo(props.id, {
+    title: newTitle.value
   })
   isEditingMode.value = false
+}
+async function updateTodo(id: Todo['id'], todoPatch: TodoRequest) {
+  if (typeof todoPatch.title === 'string' && !isValidTodoTitle(todoPatch.title) ) return
+
+  const updatedTodo = await api.editTodo(id, todoPatch)
+  if (updatedTodo) props.updateTodoList()
 }
 function cancelTodoTitleChange() {
   isEditingMode.value = false
   newTitle.value = props.title
 }
 function toggleTodoStatus() {
-  emit('update', props.id, {
-    isDone: !props.isDone,
+
+  updateTodo(props.id, {
+    isDone: !props.isDone
   })
+}
+async function deleteTodo() {
+  try {
+    const resp = await api.deleteTodo(props.id)
+
+    if (resp) props.updateTodoList()
+  } catch(err) {
+    console.log('err: ', err)
+  }
 }
 
 
@@ -90,7 +104,7 @@ function toggleTodoStatus() {
 
       </div>
       <button class="delete-btn"
-        @click="emit('delete', props.id)"
+        @click="deleteTodo"
       >
         <IconDelete></IconDelete>
       </button>
