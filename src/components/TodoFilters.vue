@@ -1,94 +1,79 @@
 <script setup lang="ts">
-import type { TodoInfo } from '~/types';
+import type { FilterOption, TodoInfo } from '~/types';
 
-type FilterOption = keyof TodoInfo
+const props = defineProps<{
+  todoInfo: TodoInfo
+  selectedFilter: FilterOption
+}>()
+const emit = defineEmits<{
+  'update:selectedFilter': [selectedFilter: FilterOption]
+}>()
 
-// 1) 3.4+ style 
-const props = defineProps<TodoInfo>()
-const selectedFilter = defineModel<FilterOption>('selectedFilter', {required: true})
-
-//* 2) Old style 
-
-// import { computed } from 'vue';
-// const props = defineProps<TodoInfo & {selectedFilter: FilterOption}>()
-// const emit = defineEmits<{
-//   'update:selectedFilter': [selectedFilter: FilterOption]
-// }>()
-
-// const _selectedFilter = computed<FilterOption>({
-//   get: () => props.selectedFilter,
-//   set: (value) => emit('update:selectedFilter', value)
-// })
+const toRus: Record<FilterOption, string> = {
+  all: 'Все',
+  completed: 'Сделано',
+  inWork: 'В работе',
+}
 
 </script>
 
 <template>
-  <form class="todo-filters">
-    <label class="filter-option"
-      :class="{'_selected-filter': selectedFilter === 'all' }"
-      tabindex="0"
-    >
-      <div class="filter-option-text">Все ({{ props.all }})</div>
-      <input class="filter-radio _hidden"
-        type="radio"
-        name="selectedFilter"
-        value="all"
-        v-model="selectedFilter"
+  <nav class="todo-filters-nav">
+    <ul class="filter-options">
+      
+      <li class="filter-option" 
+        :class="{'selected': selectedFilter === 'all' }" 
       >
-        
-    </label>
-    <label class="filter-option"
-      :class="{'_selected-filter': selectedFilter === 'inWork' }"
-      tabindex="0"
-    >
-      <div class="filter-option-text">В работе ({{ props.inWork }})</div>
-      <input class="filter-radio _hidden"
-        name="selectedFilter"
-        type="radio"
-        value="inWork"
-        v-model="selectedFilter"
+        <button class="filter-button" @click="() => emit('update:selectedFilter', 'all')">
+          {{ toRus.all }} ({{ props.todoInfo.all }})
+        </button>
+      </li>
+
+      <li class="filter-option" 
+        :class="{'selected': selectedFilter === 'inWork' }" 
       >
-    </label>
-    <label class="filter-option"
-      :class="{'_selected-filter': selectedFilter === 'completed' }"
-      tabindex="0"
-    >
-      <div class="filter-option-text">Сделано ({{ props.completed }})</div>
-      <input class="filter-radio _hidden"
-        name="selectedFilter"
-        type="radio"
-        value="completed"
-        v-model="selectedFilter"
+        <button class="filter-button" @click="() => emit('update:selectedFilter', 'inWork')">
+          {{ toRus.inWork }} ({{ props.todoInfo.inWork }})
+        </button>
+      </li>
+      
+      <li class="filter-option" 
+        :class="{'selected': selectedFilter === 'completed' }" 
       >
-    </label>
-    
-  </form>
+        <button class="filter-button" @click="() => emit('update:selectedFilter', 'completed')">
+          {{ toRus.completed }} ({{ props.todoInfo.completed }})
+        </button>
+      </li>
+
+    </ul>
+  </nav>
 </template>
 
 <style scoped>
-.todo-filters {
+.filter-options {
   display: flex;
+  flex-direction: row;
   gap: 20px;
+  padding: 0;
 }
+
 .filter-option {
-  
+  flex: 1 1 auto;
+  list-style: none;
 }
-.filter-option-text {
-  font-weight: bold;
-}
-.filter-radio {
+
+.filter-button {
+  text-wrap: nowrap;
+  border: none;
+
   &:focus {
-    outline: 1px solid #eee;
+    outline: none;
+    text-decoration: underline;
   }
-}
-._selected-filter {
-  color: #4ba8f0;
-}
-._hidden {
-  width: 0;
-  height: 0;
-  opacity: 0;
-  position: absolute;
+
+  .selected & {
+    color: #4ba8f0;
+  }
 }
 
 

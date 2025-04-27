@@ -1,3 +1,5 @@
+export type FilterOption = keyof TodoInfo
+
 export type TodoRequest = Partial<Omit<Todo, "id" | "created">>;
 
 export interface Todo { 

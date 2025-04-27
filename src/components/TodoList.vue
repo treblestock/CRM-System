@@ -6,7 +6,10 @@ import TodoItem from './TodoItem.vue';
 
 const props = defineProps<{
   todos: Todo[]
-  updateTodoList(...args: any): void
+}>()
+const emit = defineEmits<{
+  updateTodo: []
+  deleteTodo: []
 }>()
 
 
@@ -17,9 +20,9 @@ const props = defineProps<{
   <div class="todo-list">
     <TodoItem class="todo-item"
       v-for="todo in props.todos" :key="todo.id" 
-      :="todo"
-      :updateTodoList="updateTodoList"
-
+      :todo="todo"
+      @updateTodo="emit('updateTodo')"
+      @deleteTodo="emit('deleteTodo')"
     ></TodoItem>
   </div>
 </template>

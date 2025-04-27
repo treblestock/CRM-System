@@ -1,112 +1,128 @@
 <script setup lang="ts">
-import { nextTick, ref, useTemplateRef } from 'vue';
 import type { Todo, TodoRequest } from '~/types';
+import * as api from '~/api';
+import { checkIsValidTodoTitle } from '~/utils';
+import { nextTick, ref, useTemplateRef } from 'vue';
+
 import IconCancel from './icons/IconCancel.vue';
 import IconSave from './icons/IconSave.vue';
 import IconEdit from './icons/IconEdit.vue';
 import IconDelete from './icons/IconDelete.vue';
-import api from '~/api';
-import { isValidTodoTitle } from '~/utils';
 
 
-const props = defineProps<Todo & {
-  updateTodoList(...args: any): void
+const props = defineProps<{
+  todo: Todo
+}>()
+const emit = defineEmits<{
+  updateTodo: []
+  deleteTodo: []
 }>()
 
-const isEditingMode = ref(false)
+
+const newTitle = ref(props.todo.title)
 const HTMLNewTitleInput = useTemplateRef('HTMLNewTitle')
-const newTitle = ref(props.title)
+const isEditingMode = ref(false)
 
 function startTodoEditing() {
-  newTitle.value = props.title
+  newTitle.value = props.todo.title
   isEditingMode.value = true
   nextTick(() => HTMLNewTitleInput.value?.focus() )
 }
 
-function saveTodoTitle() {
-  updateTodo(props.id, {
-    title: newTitle.value
-  })
-  isEditingMode.value = false
-}
+
 async function updateTodo(id: Todo['id'], todoPatch: TodoRequest) {
-  if (typeof todoPatch.title === 'string' && !isValidTodoTitle(todoPatch.title) ) return
+  if ('title' in todoPatch && !checkIsValidTodoTitle(todoPatch.title) ) return
 
-  const updatedTodo = await api.editTodo(id, todoPatch)
-  if (updatedTodo) props.updateTodoList()
-}
-function cancelTodoTitleChange() {
-  isEditingMode.value = false
-  newTitle.value = props.title
-}
-function toggleTodoStatus() {
-
-  updateTodo(props.id, {
-    isDone: !props.isDone
-  })
-}
-async function deleteTodo() {
   try {
-    const resp = await api.deleteTodo(props.id)
-
-    if (resp) props.updateTodoList()
+    await api.editTodo(id, todoPatch)
+    emit('updateTodo')
   } catch(err) {
     console.log('err: ', err)
   }
 }
 
+function saveTodoTitle() {
+  try {
+    updateTodo(props.todo.id, {
+      title: newTitle.value
+    })
+  } finally {
+    isEditingMode.value = false
+  }
+}
 
+function cancelTodoTitleChange() {
+  isEditingMode.value = false
+  newTitle.value = props.todo.title
+}
 
+function toggleTodoStatus() {
+  updateTodo(props.todo.id, {
+    isDone: !props.todo.isDone
+  })
+}
+
+async function deleteTodo() {
+  try {
+    await api.deleteTodo(props.todo.id)
+    emit('deleteTodo')
+  } catch(err) {
+    console.log('err: ', err)
+  }
+}
 </script>
 
 <template>
   <div class="todo"
-    :class="{'_is-done': props.isDone}"
+    :class="{'is-done': props.todo.isDone}"
   >
     <input type="checkbox" class="todo-status"
-      :checked="props.isDone"
+      :checked="props.todo.isDone"
       @input="toggleTodoStatus"
     >
     <div class="todo-title">
       <div class="actual-todo-title"
         v-if="!isEditingMode"
-      >{{ props.title }}</div>
-      <input class="new-todo-title"
+      >{{ props.todo.title }}</div>
+      
+      <form class="new-todo-title-from"
         v-else
-        type="text"
-        v-model="newTitle"
-        ref="HTMLNewTitle"
+        @submit.prevent="saveTodoTitle"
       >
-    </div>
-    <div class="todo-toolbar">
-      <div class="todo-toolbar-edit-group">
-        <button class="edit-btn"
-          v-if="!isEditingMode"
-          @click="startTodoEditing"
+        <input class="new-todo-title"
+          type="text"
+          ref="HTMLNewTitle"
+          v-model="newTitle"
         >
-          <IconEdit class="edit-btn"></IconEdit>
+      </form>
+    </div>
+
+    <div class="todo-toolbar">
+      <button class="edit-btn"
+        v-if="!isEditingMode"
+        @click="startTodoEditing"
+      >
+        <IconEdit class="edit-btn" />
+      </button>
+
+      <template v-else>
+        <button class="save-btn"
+          @click="saveTodoTitle"
+        >
+          <IconSave />
         </button>
 
-        <div class="save-or-cancel-change"
-          v-else
+        <button class="cancel-btn"
+          @click="cancelTodoTitleChange"
         >
-          <button class="save-btn"
-            @click="saveTodoTitle"
-          >
-            <IconSave></IconSave>
-          </button>
-          <button class="cancel-btn"
-            @click="cancelTodoTitleChange"
-          >
-            <IconCancel></IconCancel>
-          </button>
-        </div>
+          <IconCancel />
+        </button>
+      </template>
 
-      </div>
       <button class="delete-btn"
         @click="deleteTodo"
       >
-        <IconDelete></IconDelete>
+        <IconDelete />
       </button>
     </div>
   </div>
@@ -125,10 +141,12 @@ async function deleteTodo() {
 .todo-title {
   flex: 1 1 auto;
 
-  ._is-done & {
+  .is-done & {
     text-decoration: line-through;
   }
 }
+
+/* toolbar */
 .todo-toolbar {
   flex: 0 0 auto;
 
@@ -136,17 +154,9 @@ async function deleteTodo() {
   align-items: center;
   gap: 10px;
 }
-.todo-toolbar-edit-group {
 
-
-}
-.save-or-cancel-change {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 .edit-btn {
-  background: #0c3dc5;
+  background: lightblue;
 }
 .save-btn {
   background: green;
