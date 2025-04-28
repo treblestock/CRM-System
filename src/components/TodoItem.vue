@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Todo, TodoRequest } from '~/types';
-import * as api from '~/api';
-import { checkIsValidTodoTitle } from '~/utils';
+import { deleteTodo, editTodo } from '~/api';
+import { checkStringInLengthRange } from '~/utils';
 import { nextTick, ref, useTemplateRef } from 'vue';
 
 import { Input, Button } from 'ant-design-vue'
@@ -24,7 +24,7 @@ const newTitle = ref(props.todo.title)
 const HTMLNewTitleInput = useTemplateRef('HTMLNewTitle')
 const isEditingMode = ref(false)
 
-function startTodoEditing() {
+function handleStartTodoEditing() {
   newTitle.value = props.todo.title
   isEditingMode.value = true
   nextTick(() => HTMLNewTitleInput.value?.$el.focus() )
@@ -32,10 +32,12 @@ function startTodoEditing() {
 
 
 async function updateTodo(id: Todo['id'], todoPatch: TodoRequest) {
-  if ('title' in todoPatch && !checkIsValidTodoTitle(todoPatch.title) ) return
+  if ('title' in todoPatch && !checkStringInLengthRange(todoPatch.title, 2, 64) ) {
+    return
+  }
 
   try {
-    await api.editTodo(id, todoPatch)
+    await editTodo(id, todoPatch)
     emit('updateTodo')
   } catch(err) {
     console.log('err: ', err)
@@ -52,7 +54,7 @@ function handleChangeTodoTitle() {
   }
 }
 
-function handleCancelTodoTitleChange() {
+function handleCancelTodoChange() {
   isEditingMode.value = false
   newTitle.value = props.todo.title
 }
@@ -65,7 +67,7 @@ function handleToggleTodoStatus() {
 
 async function handleDeleteTodo() {
   try {
-    await api.deleteTodo(props.todo.id)
+    await deleteTodo(props.todo.id)
     emit('deleteTodo')
   } catch(err) {
     console.log('err: ', err)
@@ -103,9 +105,9 @@ async function handleDeleteTodo() {
 
     <div class="todo-toolbar">
       <Button class="edit-btn"
-        v-if="!isEditingMode"
         type="primary"
-        @click="startTodoEditing"
+        v-if="!isEditingMode"
+        @click="handleStartTodoEditing"
       >
         <IconEdit class="edit-btn" />
       </Button>
@@ -118,7 +120,7 @@ async function handleDeleteTodo() {
         </Button>
 
         <Button class="cancel-btn"
-          @click="handleCancelTodoTitleChange"
+          @click="handleCancelTodoChange"
         >
           <IconCancel />
         </Button>

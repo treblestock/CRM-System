@@ -15,6 +15,11 @@ const toRus: Record<FilterOption, string> = {
   inWork: 'В работе',
 }
 
+function handleFilterChange(event: Event) {
+  const target = event.target as HTMLElement
+  const newFilter = target.dataset.filterValue as FilterOption
+  emit('update:selectedFilter', newFilter)
+}
 </script>
 
 <template>
@@ -24,7 +29,10 @@ const toRus: Record<FilterOption, string> = {
       <li class="filter-option" 
         :class="{'selected': selectedFilter === 'all' }" 
       >
-        <button class="filter-button" @click="() => emit('update:selectedFilter', 'all')">
+        <button class="filter-button" 
+          data-filter-value="all"
+          @click="handleFilterChange"
+        >
           {{ toRus.all }} ({{ props.todoInfo.all }})
         </button>
       </li>
@@ -32,7 +40,10 @@ const toRus: Record<FilterOption, string> = {
       <li class="filter-option" 
         :class="{'selected': selectedFilter === 'inWork' }" 
       >
-        <button class="filter-button" @click="() => emit('update:selectedFilter', 'inWork')">
+        <button class="filter-button" 
+          data-filter-value="inWork"
+          @click="handleFilterChange"
+        >
           {{ toRus.inWork }} ({{ props.todoInfo.inWork }})
         </button>
       </li>
@@ -40,7 +51,10 @@ const toRus: Record<FilterOption, string> = {
       <li class="filter-option" 
         :class="{'selected': selectedFilter === 'completed' }" 
       >
-        <button class="filter-button" @click="() => emit('update:selectedFilter', 'completed')">
+        <button class="filter-button" 
+          data-filter-value="completed"
+          @click="handleFilterChange"
+        >
           {{ toRus.completed }} ({{ props.todoInfo.completed }})
         </button>
       </li>
