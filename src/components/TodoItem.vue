@@ -4,6 +4,7 @@ import * as api from '~/api';
 import { checkIsValidTodoTitle } from '~/utils';
 import { nextTick, ref, useTemplateRef } from 'vue';
 
+import { Input, Button } from 'ant-design-vue'
 import IconCancel from './icons/IconCancel.vue';
 import IconSave from './icons/IconSave.vue';
 import IconEdit from './icons/IconEdit.vue';
@@ -26,7 +27,7 @@ const isEditingMode = ref(false)
 function startTodoEditing() {
   newTitle.value = props.todo.title
   isEditingMode.value = true
-  nextTick(() => HTMLNewTitleInput.value?.focus() )
+  nextTick(() => HTMLNewTitleInput.value?.$el.focus() )
 }
 
 
@@ -41,7 +42,7 @@ async function updateTodo(id: Todo['id'], todoPatch: TodoRequest) {
   }
 }
 
-function saveTodoTitle() {
+function handleChangeTodoTitle() {
   try {
     updateTodo(props.todo.id, {
       title: newTitle.value
@@ -51,18 +52,18 @@ function saveTodoTitle() {
   }
 }
 
-function cancelTodoTitleChange() {
+function handleCancelTodoTitleChange() {
   isEditingMode.value = false
   newTitle.value = props.todo.title
 }
 
-function toggleTodoStatus() {
+function handleToggleTodoStatus() {
   updateTodo(props.todo.id, {
     isDone: !props.todo.isDone
   })
 }
 
-async function deleteTodo() {
+async function handleDeleteTodo() {
   try {
     await api.deleteTodo(props.todo.id)
     emit('deleteTodo')
@@ -70,16 +71,18 @@ async function deleteTodo() {
     console.log('err: ', err)
   }
 }
+
 </script>
 
 <template>
   <div class="todo"
     :class="{'is-done': props.todo.isDone}"
   >
-    <input type="checkbox" class="todo-status"
+    <Input class="todo-status"
+      type="checkbox"
       :checked="props.todo.isDone"
-      @input="toggleTodoStatus"
-    >
+      @input="handleToggleTodoStatus"
+    />
     <div class="todo-title">
       <div class="actual-todo-title"
         v-if="!isEditingMode"
@@ -87,43 +90,47 @@ async function deleteTodo() {
       
       <form class="new-todo-title-from"
         v-else
-        @submit.prevent="saveTodoTitle"
+        @submit.prevent="handleChangeTodoTitle"
       >
-        <input class="new-todo-title"
+        <Input class="new-todo-title"
           type="text"
+          :bordered="false"
           ref="HTMLNewTitle"
           v-model="newTitle"
-        >
+        />
       </form>
     </div>
 
     <div class="todo-toolbar">
-      <button class="edit-btn"
+      <Button class="edit-btn"
         v-if="!isEditingMode"
+        type="primary"
         @click="startTodoEditing"
       >
         <IconEdit class="edit-btn" />
-      </button>
+      </Button>
 
       <template v-else>
-        <button class="save-btn"
-          @click="saveTodoTitle"
+        <Button class="save-btn"
+          @click="handleChangeTodoTitle"
         >
           <IconSave />
-        </button>
+        </Button>
 
-        <button class="cancel-btn"
-          @click="cancelTodoTitleChange"
+        <Button class="cancel-btn"
+          @click="handleCancelTodoTitleChange"
         >
           <IconCancel />
-        </button>
+        </Button>
       </template>
 
-      <button class="delete-btn"
-        @click="deleteTodo"
+      <Button class="delete-btn"
+        @click="handleDeleteTodo"
+        danger
+        type="primary"
       >
         <IconDelete />
-      </button>
+      </Button>
     </div>
   </div>
 </template>
@@ -137,13 +144,17 @@ async function deleteTodo() {
 }
 .todo-status {
   flex: 0 0 auto;
+  width: initial;
 }
 .todo-title {
-  flex: 1 1 auto;
+  flex: 1 1 200px;
+  min-width: 200px;  
 
   .is-done & {
     text-decoration: line-through;
   }
+}
+.new-todo-title {
 }
 
 /* toolbar */
@@ -156,7 +167,7 @@ async function deleteTodo() {
 }
 
 .edit-btn {
-  background: lightblue;
+  /* background: lightblue; */
 }
 .save-btn {
   background: green;
@@ -165,8 +176,7 @@ async function deleteTodo() {
   background: coral;
 }
 .delete-btn {
-  background: red;
-
+  /* background: red; */
 }
 
 </style>

@@ -2,6 +2,7 @@
 import * as api from '~/api';
 import { checkIsValidTodoTitle } from '~/utils';
 import { ref } from 'vue';
+import { Button, Input } from 'ant-design-vue'
 
 
 const emit = defineEmits<{
@@ -40,17 +41,19 @@ async function onSubmit() {
     @submit.prevent="onSubmit" 
   >
     <div class="todo-title">
-      <input class="todo-title-input" 
-        type="text" 
+      <Input 
+        :bordered="false"
+        type="text"
         v-model="title"
         placeholder="Task to be done..."
       >
+      </Input>
     </div>
-    <button class="submit-btn" 
-      type="submit"
-    >
-      Add
-    </button>
+    <Button class="submit-btn"
+      type="primary"
+      htmlType="submit"
+    >add</Button>
+
 
 
     <div class="error-msg"
@@ -89,7 +92,6 @@ async function onSubmit() {
 }
 .submit-btn {
   flex: 0 0 auto;
-  background: lightblue;
 }
 .error-msg {
   flex: 0 0 100%;

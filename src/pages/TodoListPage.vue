@@ -58,7 +58,7 @@ watchEffect(updateTodoList) // initial load + update todos on filter change
 
 
 .todo-page {
-  width: min-content;
+  max-width: 600px;
   margin: 0 auto;
 
   padding: 20px;
