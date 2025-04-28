@@ -21,34 +21,25 @@ watch(
 
 <template>
   <LayoutSider class="sidebar">
-    <Menu
-      v-model:selectedKeys="activeLinks"
-    >
-      <MenuItem class="nav-item"
-        key="TodoList"
-      >
-        <RouterLink class="link"
-        :to="{name: 'TodoList'}"
-        >
+    <nav>
+      <Menu v-model:selectedKeys="activeLinks">
+        <MenuItem class="nav-item" key="TodoList">
+        <RouterLink class="link" :to="{ name: 'TodoList' }">
           <CheckSquareOutlined /> список задач
         </RouterLink>
-      </MenuItem>
+        </MenuItem>
 
-      <MenuItem class="nav-item"
-        key="UserProfile"
-      >
-        <RouterLink class="link"
-        :to="{name: 'UserProfile'}"
-        >
+        <MenuItem class="nav-item" key="UserProfile">
+        <RouterLink class="link" :to="{ name: 'UserProfile' }">
           <UserOutlined /> профиль
         </RouterLink>
-      </MenuItem>
+        </MenuItem>
 
-    </Menu>
-      
+      </Menu>
 
+    </nav>
 
-    </LayoutSider>
+  </LayoutSider>
 </template>
 
 <style scoped>
@@ -57,9 +48,6 @@ watch(
   flex-direction: column;
   gap: 20px;
 }
-.link {
 
-}
-
-
+.link {}
 </style>

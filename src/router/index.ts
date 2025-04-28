@@ -8,7 +8,7 @@ const routes = [
     name: 'main',
     props: true,
     redirect: { name: 'TodoList' },
-    component: () => import('~/pages/MainPage.vue'),
+    component: () => import('~/pages/DefaultLayout.vue'),
     children: [
       {
         path: '/todo-list',

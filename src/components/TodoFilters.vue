@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { FilterOption, TodoInfo } from '~/types';
+import { Menu, type MenuProps } from 'ant-design-vue'
+import { computed, ref, } from 'vue';
+import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
 
 const props = defineProps<{
   todoInfo: TodoInfo
@@ -15,80 +18,46 @@ const toRus: Record<FilterOption, string> = {
   inWork: 'В работе',
 }
 
-function handleFilterChange(event: Event) {
-  const target = event.target as HTMLElement
-  const newFilter = target.dataset.filterValue as FilterOption
-  emit('update:selectedFilter', newFilter)
+const selectedMenuOptions = ref<FilterOption[]>(['all'])
+const menuFilters = computed<MenuProps['items']>(() => [
+  {
+    key: 'all',
+    label: `${toRus.all} (${props.todoInfo.all})`,
+  },
+  {
+    key: 'inWork',
+    label: `${toRus.inWork} (${props.todoInfo.inWork})`,
+  },
+  {
+    key: 'completed',
+    label: `${toRus.completed} (${props.todoInfo.completed})`,
+  },
+])
+
+
+function handleFilterChange(event: MenuInfo) {
+  const filter = event.key as FilterOption
+  emit('update:selectedFilter', filter)
 }
 </script>
 
 <template>
   <nav class="todo-filters-nav">
-    <ul class="filter-options">
-      
-      <li class="filter-option" 
-        :class="{'selected': selectedFilter === 'all' }" 
-      >
-        <button class="filter-button" 
-          data-filter-value="all"
-          @click="handleFilterChange"
-        >
-          {{ toRus.all }} ({{ props.todoInfo.all }})
-        </button>
-      </li>
-
-      <li class="filter-option" 
-        :class="{'selected': selectedFilter === 'inWork' }" 
-      >
-        <button class="filter-button" 
-          data-filter-value="inWork"
-          @click="handleFilterChange"
-        >
-          {{ toRus.inWork }} ({{ props.todoInfo.inWork }})
-        </button>
-      </li>
-      
-      <li class="filter-option" 
-        :class="{'selected': selectedFilter === 'completed' }" 
-      >
-        <button class="filter-button" 
-          data-filter-value="completed"
-          @click="handleFilterChange"
-        >
-          {{ toRus.completed }} ({{ props.todoInfo.completed }})
-        </button>
-      </li>
-
-    </ul>
+    <Menu class="filter-options"
+      mode="horizontal" 
+      :items="menuFilters" 
+      v-model:selectedKeys="selectedMenuOptions" 
+      @click="handleFilterChange"
+    />
   </nav>
 </template>
 
 <style scoped>
 .filter-options {
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  padding: 0;
-}
+  justify-content: space-around;
 
-.filter-option {
-  flex: 1 1 auto;
-  list-style: none;
-}
-
-.filter-button {
-  text-wrap: nowrap;
-  border: none;
-
-  &:focus {
-    outline: none;
-    text-decoration: underline;
-  }
-
-  .selected & {
-    color: #4ba8f0;
+  &:before {
+    display: none;
   }
 }
-
-
 </style>

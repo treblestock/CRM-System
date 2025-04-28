@@ -1,103 +1,61 @@
 <script setup lang="ts">
 import { createTodo } from '~/api';
-import { checkStringInLengthRange } from '~/utils';
-import { ref } from 'vue';
-import { Button, Input } from 'ant-design-vue'
+import { Button, } from 'ant-design-vue'
+import TodoTitleForm from './TodoTitleForm.vue';
 
 
 const emit = defineEmits<{
   newTodo: []
 }>()
 
-const title = ref<string>('')
-
-const wasValidationFailed = ref(false)
-
-async function onSubmit() {
-  if (!checkStringInLengthRange(title.value, 2, 64)) {
-    wasValidationFailed.value = true
-    return
-  }
-
+async function onSubmit(title: string) {
   try {
-    const resp = await createTodo({
-      title: title.value,
+    const resp = (await createTodo({
+      title: title,
       isDone: false,
-    })
+    })).data
 
     if (!resp) {
       return
     }
-    emit('newTodo')
 
-    title.value = ''
-    wasValidationFailed.value = false
+    emit('newTodo')
   } catch(err) {
     console.log('err: ', err)
-  }
+  } 
 }
 </script>
 
 <template>
-  <form class="new-todo-form"
-    @submit.prevent="onSubmit" 
-  >
-    <div class="todo-title">
-      <Input 
-        :bordered="false"
-        type="text"
-        v-model="title"
-        placeholder="Task to be done..."
-      >
-      </Input>
-    </div>
-    <Button class="submit-btn"
-      type="primary"
+  <div class="new-todo-form">
+    <TodoTitleForm class="form-title"
+      id="newTodoForm"
+      @submit="onSubmit"
+    />
+    <Button class="submit-btn" 
+      type="primary" 
       htmlType="submit"
+      form="newTodoForm"
     >add</Button>
-
-
-
-    <div class="error-msg"
-      v-if="wasValidationFailed"
-    >
-      Поле обязательно для ввода и текст от 2 до 64 символов
-    </div>
-  </form>
+  </div>
 </template>
 
 <style scoped>
-
 .new-todo-form {
+  width: 100%;
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
   gap: 20px;
-
+  margin: 0;
 }
+
 .todo-title {
   flex: 1 1 auto;
-  font-size: 18px;
-
-  padding-bottom: 2.5px;
-  border-bottom: 1px solid #aaa;
-
+  border-bottom: 1px solid #ccc;
 }
-.todo-title-input {
-  background: none;
-  border: none;
-  outline: none;
 
-  &:focus::placeholder {
-    opacity: .6;
-  }
-}
 .submit-btn {
   flex: 0 0 auto;
-}
-.error-msg {
-  flex: 0 0 100%;
-  color: red;
 }
 
 </style>
