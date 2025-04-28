@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Todo, TodoRequest } from '~/types';
-import * as api from '~/api';
-import { checkIsValidTodoTitle } from '~/utils';
+import { deleteTodo, editTodo } from '~/api';
+import { checkStringInLengthRange } from '~/utils';
 import { nextTick, ref, useTemplateRef } from 'vue';
 
 import IconCancel from './icons/IconCancel.vue';
@@ -23,7 +23,7 @@ const newTitle = ref(props.todo.title)
 const HTMLNewTitleInput = useTemplateRef('HTMLNewTitle')
 const isEditingMode = ref(false)
 
-function startTodoEditing() {
+function handleStartTodoEditing() {
   newTitle.value = props.todo.title
   isEditingMode.value = true
   nextTick(() => HTMLNewTitleInput.value?.focus() )
@@ -31,17 +31,19 @@ function startTodoEditing() {
 
 
 async function updateTodo(id: Todo['id'], todoPatch: TodoRequest) {
-  if ('title' in todoPatch && !checkIsValidTodoTitle(todoPatch.title) ) return
+  if ('title' in todoPatch && !checkStringInLengthRange(todoPatch.title, 2, 64) ) {
+    return
+  }
 
   try {
-    await api.editTodo(id, todoPatch)
+    await editTodo(id, todoPatch)
     emit('updateTodo')
   } catch(err) {
     console.log('err: ', err)
   }
 }
 
-function saveTodoTitle() {
+function handleSaveTodoTitle() {
   try {
     updateTodo(props.todo.id, {
       title: newTitle.value
@@ -51,20 +53,20 @@ function saveTodoTitle() {
   }
 }
 
-function cancelTodoTitleChange() {
+function handleCancelTodoChange() {
   isEditingMode.value = false
   newTitle.value = props.todo.title
 }
 
-function toggleTodoStatus() {
+function handleToggleTodoStatus() {
   updateTodo(props.todo.id, {
     isDone: !props.todo.isDone
   })
 }
 
-async function deleteTodo() {
+async function handleDeleteTodo() {
   try {
-    await api.deleteTodo(props.todo.id)
+    await deleteTodo(props.todo.id)
     emit('deleteTodo')
   } catch(err) {
     console.log('err: ', err)
@@ -78,7 +80,7 @@ async function deleteTodo() {
   >
     <input type="checkbox" class="todo-status"
       :checked="props.todo.isDone"
-      @input="toggleTodoStatus"
+      @input="handleToggleTodoStatus"
     >
     <div class="todo-title">
       <div class="actual-todo-title"
@@ -87,7 +89,7 @@ async function deleteTodo() {
       
       <form class="new-todo-title-from"
         v-else
-        @submit.prevent="saveTodoTitle"
+        @submit.prevent="handleSaveTodoTitle"
       >
         <input class="new-todo-title"
           type="text"
@@ -100,27 +102,27 @@ async function deleteTodo() {
     <div class="todo-toolbar">
       <button class="edit-btn"
         v-if="!isEditingMode"
-        @click="startTodoEditing"
+        @click="handleStartTodoEditing"
       >
         <IconEdit class="edit-btn" />
       </button>
 
       <template v-else>
         <button class="save-btn"
-          @click="saveTodoTitle"
+          @click="handleSaveTodoTitle"
         >
           <IconSave />
         </button>
 
         <button class="cancel-btn"
-          @click="cancelTodoTitleChange"
+          @click="handleCancelTodoChange"
         >
           <IconCancel />
         </button>
       </template>
 
       <button class="delete-btn"
-        @click="deleteTodo"
+        @click="handleDeleteTodo"
       >
         <IconDelete />
       </button>

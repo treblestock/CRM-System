@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FilterOption, Todo, TodoInfo } from '~/types';
-import * as api from '~/api'
-import { ref, watchEffect } from 'vue';
+import { getTodos } from '~/api'
+import { onMounted, ref } from 'vue';
 
 import NewTodoForm from '~/components/NewTodoForm.vue';
 import TodoFilters from '~/components/TodoFilters.vue';
@@ -17,9 +17,10 @@ const todoInfo = ref<TodoInfo>({
   completed: 0,
 })
 
-async function updateTodoList() {
+async function updateTodoList(filter?: FilterOption) {
   try {
-    const resp = await api.getTodos(selectedFilter.value)
+    selectedFilter.value = filter ?? selectedFilter.value
+    const resp = await getTodos(selectedFilter.value)
     const fetchedTodos = resp.data
 
     todos.value = fetchedTodos
@@ -31,8 +32,7 @@ async function updateTodoList() {
   }
 }
 
-watchEffect(updateTodoList) // initial load + update todos on filter change
-  // watchEffect checks deps synchronously before first await
+onMounted(updateTodoList)
 </script>
 
 <template>
@@ -42,13 +42,13 @@ watchEffect(updateTodoList) // initial load + update todos on filter change
     ></NewTodoForm>
     <TodoFilters class="todo-filters"
       :todoInfo="todoInfo"
-      v-model:selectedFilter="selectedFilter"
+      :selectedFilter="selectedFilter"
+      @update:selectedFilter="updateTodoList"
     ></TodoFilters>
 
     <TodoList class="todo-list"
       :todos="todos"
-      @updateTodo="updateTodoList"
-      @deleteTodo="updateTodoList"
+      @update="updateTodoList"
     ></TodoList>
 
   </div>

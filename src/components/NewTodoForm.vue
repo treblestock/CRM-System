@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import * as api from '~/api';
-import { checkIsValidTodoTitle } from '~/utils';
+import { createTodo } from '~/api';
+import { checkStringInLengthRange } from '~/utils';
 import { ref } from 'vue';
 
 
@@ -13,18 +13,20 @@ const title = ref<string>('')
 const wasValidationFailed = ref(false)
 
 async function onSubmit() {
-  if (!checkIsValidTodoTitle(title.value)) {
+  if (!checkStringInLengthRange(title.value, 2, 64)) {
     wasValidationFailed.value = true
     return
   }
 
   try {
-    const resp = await api.createTodo({
+    const resp = await createTodo({
       title: title.value,
       isDone: false,
     })
 
-    if (!resp) return
+    if (!resp) {
+      return
+    }
     emit('newTodo')
 
     title.value = ''

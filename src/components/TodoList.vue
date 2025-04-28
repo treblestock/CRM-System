@@ -8,11 +8,12 @@ const props = defineProps<{
   todos: Todo[]
 }>()
 const emit = defineEmits<{
-  updateTodo: []
-  deleteTodo: []
+  update: []
 }>()
 
-
+function handleTodoListChange() {
+  emit('update')
+}
 
 </script>
 
@@ -21,8 +22,8 @@ const emit = defineEmits<{
     <TodoItem class="todo-item"
       v-for="todo in props.todos" :key="todo.id" 
       :todo="todo"
-      @updateTodo="emit('updateTodo')"
-      @deleteTodo="emit('deleteTodo')"
+      @updateTodo="handleTodoListChange"
+      @deleteTodo="handleTodoListChange"
     ></TodoItem>
   </div>
 </template>
