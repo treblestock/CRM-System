@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FilterOption, Todo, TodoInfo } from '~/types';
 import { getTodos } from '~/api'
-import { onActivated, onDeactivated, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 import NewTodoForm from '~/components/NewTodoForm.vue';
 import TodoFilters from '~/components/TodoFilters.vue';
@@ -32,13 +32,11 @@ async function updateTodoList(filter?: FilterOption) {
   }
 }
 
-let timerId: number
+let timerId = setInterval(updateTodoList, 5000)
 
-onActivated(() => {
-  updateTodoList()
-  timerId = setInterval(updateTodoList, 5000)
-})
-onDeactivated(() => clearInterval(timerId))
+onMounted(updateTodoList)
+onUnmounted(() => clearInterval(timerId))
+
 </script>
 
 <template>

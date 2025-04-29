@@ -8,12 +8,9 @@ import AppSidebar from '~/components/AppSidebar.vue';
 <template>
   <Layout class="page">
     <LayoutContent class="content">
-      <RouterView #="{ Component }">
-        <KeepAlive>
-          <component :is="Component"></component>
-        </KeepAlive>
-      </RouterView>
+      <RouterView />
     </LayoutContent>
+    
     <AppSidebar />
   </Layout>
 </template>
