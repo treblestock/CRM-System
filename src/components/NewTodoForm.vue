@@ -8,7 +8,7 @@ const emit = defineEmits<{
   newTodo: []
 }>()
 
-async function onSubmit(title: string) {
+async function handleCreateTodo(title: string) {
   try {
     const resp = (await createTodo({
       title: title,
@@ -30,7 +30,7 @@ async function onSubmit(title: string) {
   <div class="new-todo-form">
     <TodoTitleForm class="form-title"
       id="newTodoForm"
-      @submit="onSubmit"
+      @submit="handleCreateTodo"
     />
     <Button class="submit-btn" 
       type="primary" 
@@ -49,7 +49,7 @@ async function onSubmit(title: string) {
   margin: 0;
 }
 
-.todo-title {
+.form-title {
   flex: 1 1 auto;
   border-bottom: 1px solid #ccc;
 }
