@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { FilterOption, Todo, TodoInfo } from '~/types';
-import { getTodos } from '~/api'
+import type { FilterOption, Todo, TodoInfo } from '~/types/todo';
+import { getTodos } from '~/api/todo'
 import { onMounted, onUnmounted, ref } from 'vue';
 
 import NewTodoForm from '~/components/NewTodoForm.vue';
@@ -42,7 +42,7 @@ onUnmounted(() => clearInterval(timerId))
 <template>
   <div class="todo-page">
     <NewTodoForm class="new-todo-form"
-      @newTodo="updateTodoList"
+      @submit="updateTodoList"
     ></NewTodoForm>
     <TodoFilters class="todo-filters"
       :todoInfo="todoInfo"

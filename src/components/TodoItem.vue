@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Todo } from '~/types';
-import { deleteTodo, editTodo } from '~/api';
+import type { Todo } from '~/types/todo';
+import { deleteTodo, editTodo } from '~/api/todo';
 import { ref } from 'vue';
 
 import { Button, Checkbox } from 'ant-design-vue'
@@ -24,7 +24,7 @@ const isEditingMode = ref(false)
 
 async function handleToggleTodoStatus() {
   try {
-    editTodo(props.todo.id, { isDone: !props.todo.isDone})
+    await editTodo(props.todo.id, { isDone: !props.todo.isDone})
     emit('updateTodo')
   } catch(err) {
     console.log('err: ', err)

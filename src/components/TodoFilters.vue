@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FilterOption, TodoInfo } from '~/types';
+import type { FilterOption, TodoInfo } from '~/types/todo';
 import { Menu, type MenuProps } from 'ant-design-vue'
 import { computed, ref, } from 'vue';
 import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
@@ -12,7 +12,7 @@ const emit = defineEmits<{
   'update:selectedFilter': [selectedFilter: FilterOption]
 }>()
 
-const toRus: Record<FilterOption, string> = {
+const ruFilterLabel: Record<FilterOption, string> = {
   all: 'Все',
   completed: 'Сделано',
   inWork: 'В работе',
@@ -22,15 +22,15 @@ const selectedMenuOptions = ref<FilterOption[]>(['all'])
 const menuFilters = computed<MenuProps['items']>(() => [
   {
     key: 'all',
-    label: `${toRus.all} (${props.todoInfo.all})`,
+    label: `${ruFilterLabel.all} (${props.todoInfo.all})`,
   },
   {
     key: 'inWork',
-    label: `${toRus.inWork} (${props.todoInfo.inWork})`,
+    label: `${ruFilterLabel.inWork} (${props.todoInfo.inWork})`,
   },
   {
     key: 'completed',
-    label: `${toRus.completed} (${props.todoInfo.completed})`,
+    label: `${ruFilterLabel.completed} (${props.todoInfo.completed})`,
   },
 ])
 
