@@ -7,9 +7,21 @@ const routes = [
     path: '/',
     name: 'main',
     props: true,
-    component: () => import('~/pages/TodoListPage.vue'),
+    redirect: { name: 'TodoList' },
+    component: () => import('~/layouts/DefaultLayout.vue'),
     children: [
-      
+      {
+        path: '/todo-list',
+        name: 'TodoList',
+        props: true,
+        component: () => import('~/pages/TodoListPage.vue'),
+      },
+      {
+        path: '/user-profile',
+        name: 'UserProfile',
+        props: true,
+        component: () => import('~/pages/UserProfilePage.vue'),
+      }
     ],
   },
 ] satisfies RouteRecordRaw[]

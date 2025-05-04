@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { Todo, TodoRequest } from '~/types';
-import { deleteTodo, editTodo } from '~/api';
-import { checkStringInLengthRange } from '~/utils';
-import { nextTick, ref, useTemplateRef } from 'vue';
+import type { Todo } from '~/types/todo';
+import { deleteTodo, editTodo } from '~/api/todo';
+import { ref } from 'vue';
 
+import { Button, Checkbox } from 'ant-design-vue'
+import TodoTitleForm from './TodoTitleForm.vue';
 import IconCancel from './icons/IconCancel.vue';
 import IconSave from './icons/IconSave.vue';
 import IconEdit from './icons/IconEdit.vue';
 import IconDelete from './icons/IconDelete.vue';
-
 
 const props = defineProps<{
   todo: Todo
@@ -20,37 +20,20 @@ const emit = defineEmits<{
 
 
 const newTitle = ref(props.todo.title)
-const HTMLNewTitleInput = useTemplateRef('HTMLNewTitle')
 const isEditingMode = ref(false)
 
-function handleStartTodoEditing() {
-  newTitle.value = props.todo.title
-  isEditingMode.value = true
-  nextTick(() => HTMLNewTitleInput.value?.focus() )
-}
-
-
-async function updateTodo(id: Todo['id'], todoPatch: TodoRequest) {
-  if ('title' in todoPatch && !checkStringInLengthRange(todoPatch.title, 2, 64) ) {
-    return
-  }
-
+async function handleToggleTodoStatus() {
   try {
-    await editTodo(id, todoPatch)
+    await editTodo(props.todo.id, { isDone: !props.todo.isDone})
     emit('updateTodo')
   } catch(err) {
     console.log('err: ', err)
   }
 }
 
-function handleSaveTodoTitle() {
-  try {
-    updateTodo(props.todo.id, {
-      title: newTitle.value
-    })
-  } finally {
-    isEditingMode.value = false
-  }
+function handleStartTodoEditing() {
+  newTitle.value = props.todo.title
+  isEditingMode.value = true
 }
 
 function handleCancelTodoChange() {
@@ -58,10 +41,13 @@ function handleCancelTodoChange() {
   newTitle.value = props.todo.title
 }
 
-function handleToggleTodoStatus() {
-  updateTodo(props.todo.id, {
-    isDone: !props.todo.isDone
-  })
+async function handleChangeTodoTitle(newTitle: string) {
+  try {
+    await editTodo(props.todo.id, { title: newTitle })
+    emit('updateTodo')
+  } finally {
+    isEditingMode.value = false
+  }
 }
 
 async function handleDeleteTodo() {
@@ -72,60 +58,62 @@ async function handleDeleteTodo() {
     console.log('err: ', err)
   }
 }
+
 </script>
 
 <template>
   <div class="todo"
     :class="{'is-done': props.todo.isDone}"
   >
-    <input type="checkbox" class="todo-status"
+    <Checkbox class="todo-status"
       :checked="props.todo.isDone"
-      @input="handleToggleTodoStatus"
-    >
+      @change="handleToggleTodoStatus"
+    />
+
     <div class="todo-title">
       <div class="actual-todo-title"
         v-if="!isEditingMode"
       >{{ props.todo.title }}</div>
       
-      <form class="new-todo-title-from"
+      <TodoTitleForm class="new-todo-title"
         v-else
-        @submit.prevent="handleSaveTodoTitle"
-      >
-        <input class="new-todo-title"
-          type="text"
-          ref="HTMLNewTitle"
-          v-model="newTitle"
-        >
-      </form>
+        id="editTitleForm"
+        :title="newTitle"
+        @submit="handleChangeTodoTitle"
+      />
     </div>
 
     <div class="todo-toolbar">
-      <button class="edit-btn"
+      <Button class="edit-btn"
+        type="primary"
         v-if="!isEditingMode"
         @click="handleStartTodoEditing"
       >
         <IconEdit class="edit-btn" />
-      </button>
+      </Button>
 
       <template v-else>
-        <button class="save-btn"
-          @click="handleSaveTodoTitle"
+        <Button class="save-btn"
+          form="editTitleForm"
+          htmlType="submit"
         >
           <IconSave />
-        </button>
+        </Button>
 
-        <button class="cancel-btn"
+        <Button class="cancel-btn"
           @click="handleCancelTodoChange"
         >
           <IconCancel />
-        </button>
+        </Button>
       </template>
 
-      <button class="delete-btn"
+      <Button class="delete-btn"
         @click="handleDeleteTodo"
+        danger
+        type="primary"
       >
         <IconDelete />
-      </button>
+      </Button>
     </div>
   </div>
 </template>
@@ -139,13 +127,22 @@ async function handleDeleteTodo() {
 }
 .todo-status {
   flex: 0 0 auto;
+  width: initial;
 }
 .todo-title {
-  flex: 1 1 auto;
+  flex: 1 1 200px;
+  min-width: 200px;
+
 
   .is-done & {
     text-decoration: line-through;
   }
+}
+.actual-todo-title {
+}
+
+.new-todo-title {
+  
 }
 
 /* toolbar */
@@ -158,7 +155,7 @@ async function handleDeleteTodo() {
 }
 
 .edit-btn {
-  background: lightblue;
+  /* background: lightblue; */
 }
 .save-btn {
   background: green;
@@ -167,8 +164,7 @@ async function handleDeleteTodo() {
   background: coral;
 }
 .delete-btn {
-  background: red;
-
+  /* background: red; */
 }
 
 </style>

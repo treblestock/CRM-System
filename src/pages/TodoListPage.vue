@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { FilterOption, Todo, TodoInfo } from '~/types';
-import { getTodos } from '~/api'
-import { onMounted, ref } from 'vue';
+import type { FilterOption, Todo, TodoInfo } from '~/types/todo';
+import { getTodos } from '~/api/todo'
+import { onMounted, onUnmounted, ref } from 'vue';
 
 import NewTodoForm from '~/components/NewTodoForm.vue';
 import TodoFilters from '~/components/TodoFilters.vue';
@@ -20,7 +20,7 @@ const todoInfo = ref<TodoInfo>({
 async function updateTodoList(filter?: FilterOption) {
   try {
     selectedFilter.value = filter ?? selectedFilter.value
-    const resp = await getTodos(selectedFilter.value)
+    const resp = (await getTodos(selectedFilter.value)).data
     const fetchedTodos = resp.data
 
     todos.value = fetchedTodos
@@ -32,20 +32,23 @@ async function updateTodoList(filter?: FilterOption) {
   }
 }
 
+let timerId = setInterval(updateTodoList, 5000)
+
 onMounted(updateTodoList)
+onUnmounted(() => clearInterval(timerId))
+
 </script>
 
 <template>
   <div class="todo-page">
     <NewTodoForm class="new-todo-form"
-      @newTodo="updateTodoList"
+      @submit="updateTodoList"
     ></NewTodoForm>
     <TodoFilters class="todo-filters"
       :todoInfo="todoInfo"
       :selectedFilter="selectedFilter"
       @update:selectedFilter="updateTodoList"
     ></TodoFilters>
-
     <TodoList class="todo-list"
       :todos="todos"
       @update="updateTodoList"
@@ -58,7 +61,6 @@ onMounted(updateTodoList)
 
 
 .todo-page {
-  width: min-content;
   margin: 0 auto;
 
   padding: 20px;
