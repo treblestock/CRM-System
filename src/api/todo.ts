@@ -1,4 +1,4 @@
-import type { FilterOption, MetaResponse, Todo, TodoInfo, TodoRequest } from "~/types";
+import type { FilterOption, MetaResponse, Todo, TodoInfo, TodoRequest } from "~/types/todo";
 import axios, { type AxiosResponse } from 'axios'
 const BASE_URL = 'https://easydev.club/api/v1'
 

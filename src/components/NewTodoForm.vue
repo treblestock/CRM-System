@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { createTodo } from '~/api';
+import { createTodo } from '~/api/todo';
 import { Button, } from 'ant-design-vue'
 import TodoTitleForm from './TodoTitleForm.vue';
 

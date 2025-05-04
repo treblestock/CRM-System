@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Todo } from '~/types';
-import { deleteTodo, editTodo } from '~/api';
+import type { Todo } from '~/types/todo';
+import { deleteTodo, editTodo } from '~/api/todo';
 import { ref } from 'vue';
 
 import { Button, Checkbox } from 'ant-design-vue'

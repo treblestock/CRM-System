@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { FilterOption, TodoInfo } from '~/types';
+import type { FilterOption, TodoInfo } from '~/types/todo';
 import { Menu, type MenuProps } from 'ant-design-vue'
 import { computed, ref, } from 'vue';
 import type { MenuInfo } from 'ant-design-vue/es/menu/src/interface';
