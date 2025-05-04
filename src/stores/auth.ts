@@ -1,7 +1,6 @@
 import axios, { AxiosError, type AxiosResponse } from "axios"
 import { defineStore } from "pinia"
 import { ref } from "vue"
-import { useRouter } from "vue-router"
 import { axiosUser, refresh as apiRefresh, signin as apiSignin, signout as apiSignout, signup as apiSignup } from "~/api/user"
 import type { AuthData, Token } from "~/types/user"
 
@@ -11,32 +10,10 @@ export const REFRESH_TOKEN_KEY = 'refreshToken'
 
 
 export default defineStore('auth', () => {
-  const router = useRouter()
-
   const isAuth = ref(false)
 
   const signup = apiSignup
 
-  // async function signin(authData: AuthData)  {
-  //   try {
-  //     const resp = await apiSignin(authData)
-
-  //     if (resp.status === 200) {
-  //       onSignin(resp.data)
-  //     }
-
-  //     return resp
-  //   } catch(err) {
-  //     console.log('err: ', err)
-  //     throw err
-  //   }
-  // }
-  
-  // function onSignin({accessToken, refreshToken}: Token): void {
-  //   axiosUser.defaults.headers.common.Authorization = `Bearer ${accessToken}` 
-  //   localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
-  //   isAuth.value = true
-  // }
   function signin(authData: AuthData)  {
     return apiSignin(authData)
       .then(onSignin)
@@ -62,7 +39,6 @@ export default defineStore('auth', () => {
     delete axiosUser.defaults.headers.common.Authorization
     localStorage.removeItem(REFRESH_TOKEN_KEY)
     isAuth.value = false
-    // router.push({name: 'auth'})
   }
 
 
@@ -75,26 +51,6 @@ export default defineStore('auth', () => {
     return apiRefresh({ refreshToken })
       .then(onSignin)
   }
-  // async function refresh() {
-  //   const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
-  //   if (!refreshToken) {
-  //     return new AxiosError("refresh token is missing", '401')
-  //   }
-
-  //   try {
-  //     const resp = await apiRefresh({ refreshToken })
-  //     if (resp instanceof AxiosError) {
-  //       throw resp
-  //     }
-
-  //     return true
-  //   } catch(err) {
-  //     console.log('err: ', err)
-  //     onSignout()
-  //     return false
-  //   }
-  // }
-
 
   axiosUser.interceptors.response.use(undefined,
     (error) => {

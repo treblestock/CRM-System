@@ -44,7 +44,7 @@ const formRules = ref<Partial<Record<keyof FormState, RuleObject[] | RuleObject 
   username: [
     {required: true, message: 'Поле обязательно для ввода', trigger: 'change'},
     {min: 1, max: 60, message: 'Логин от 1 до 60 символов', trigger: 'change'},
-    {pattern: /^([A-z]|[А-я])+$/, message: 'Логин может состоять только из букв русского/латинского алфавита'},
+    {pattern: /^([A-z]|[А-я]|\s)+$/, message: 'Логин может состоять только из букв русского/латинского алфавита'},
   ],
   login: [
     {required: true, message: 'Поле обязательно для ввода', trigger: 'change'},

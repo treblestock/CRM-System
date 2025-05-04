@@ -42,7 +42,7 @@ onUnmounted(() => clearInterval(timerId))
 <template>
   <div class="todo-page">
     <NewTodoForm class="new-todo-form"
-      @newTodo="updateTodoList"
+      @submit="updateTodoList"
     ></NewTodoForm>
     <TodoFilters class="todo-filters"
       :todoInfo="todoInfo"

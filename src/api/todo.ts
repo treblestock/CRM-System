@@ -6,11 +6,9 @@ const axiosTodo = axios.create({
   baseURL: BASE_URL
 })
 
-export const getTodos = async (filter?: FilterOption): Promise<AxiosResponse<MetaResponse<Todo, TodoInfo>>> => 
+export const getTodos = async (filter: FilterOption = 'all'): Promise<AxiosResponse<MetaResponse<Todo, TodoInfo>>> => 
   axiosTodo.get(`/todos`, {
-    params: {
-      filter: filter || 'all',
-    }
+    params: { filter }
   })
 
 export const getTodo = async (id: Todo['id']): Promise<AxiosResponse<Todo>> => 

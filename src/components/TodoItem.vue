@@ -24,7 +24,7 @@ const isEditingMode = ref(false)
 
 async function handleToggleTodoStatus() {
   try {
-    editTodo(props.todo.id, { isDone: !props.todo.isDone})
+    await editTodo(props.todo.id, { isDone: !props.todo.isDone})
     emit('updateTodo')
   } catch(err) {
     console.log('err: ', err)

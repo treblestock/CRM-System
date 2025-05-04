@@ -5,7 +5,7 @@ import TodoTitleForm from './TodoTitleForm.vue';
 
 
 const emit = defineEmits<{
-  newTodo: []
+  submit: []
 }>()
 
 async function handleCreateTodo(title: string) {
@@ -19,7 +19,7 @@ async function handleCreateTodo(title: string) {
       return
     }
 
-    emit('newTodo')
+    emit('submit')
   } catch(err) {
     console.log('err: ', err)
   } 

@@ -19,10 +19,6 @@ const routes = [
           isAuthOnly: true,
         },
         component: () => import('~/pages/TodoListPage.vue'),
-        children: [
-          
-        ],
-        
       },
       {
         path: '/user-profile',
@@ -32,9 +28,6 @@ const routes = [
           isAuthOnly: true,
         },
         component: () => import('~/pages/UserProfilePage.vue'),
-        children: [
-          
-        ],
       }
     ],
   },
@@ -50,18 +43,12 @@ const routes = [
         name: 'signin',
         props: true,
         component: () => import('~/pages/SigninFormPage.vue'),
-        children: [
-          
-        ],
       },
       {
         path: 'signup',
         name: 'signup',
         props: true,
         component: () => import('~/pages/SignupFormPage.vue'),
-        children: [
-          
-        ],
       },
     ],
   },
