@@ -5,7 +5,6 @@ import type { FormExpose } from 'ant-design-vue/es/form/Form';
 
 import {Button, Checkbox, ConfigProvider, Form, FormItem, Input, Row } from 'ant-design-vue'
 import { ref, useTemplateRef } from 'vue';
-import { useRouter } from 'vue-router';
 import useStoreAuth from '~/stores/auth'
 
 
@@ -34,10 +33,10 @@ const formState = ref<FormState>({
 const shouldRemember = ref(false)
 
 const errorMsg = ref('')
+const isSignupPassed = ref(false)
 
 const formComp = useTemplateRef('formComp')
 
-const router = useRouter()
 const authStore = useStoreAuth()
 
 const formRules = ref<Partial<Record<keyof FormState, RuleObject[] | RuleObject >> >({
@@ -96,11 +95,10 @@ async function handleSignup() {
 
     if (resp.status === 201) {
       errorMsg.value = ''
+      isSignupPassed.value = true
       emit('submit', formState.value)
       const formApi = formComp.value as unknown as FormExpose
       formApi.resetFields()
-
-      router.push({name: 'signin'})
     }
   } catch(err) {
     console.log('err: ', err)
@@ -115,6 +113,17 @@ async function handleSignup() {
       <div class="text-section">
         <h1 class="title">Create an Account</h1>
         <div class="description">See what is going on with your business</div>
+      </div>
+      
+      <div class="signup-passed-msg"
+        v-if="isSignupPassed"
+      >
+        Registration is successful. 
+        <RouterLink class="signup-passed-msg-link"
+          :to="{name: 'signin'}"
+        >
+          Go to the authorization page
+        </RouterLink> 
       </div>
 
       <ConfigProvider
@@ -265,6 +274,18 @@ async function handleSignup() {
   font-size: 16px;
   color: var(--color-grey);
 }
+
+.signup-passed-msg {
+  font-size: 17px;
+  color: var(--color-grey);
+
+  margin-bottom: 16px;
+}
+.signup-passed-msg-link {
+  color: var(--color-primary);
+}
+
+
 .error {
   margin-top: 15px;
   color: red;

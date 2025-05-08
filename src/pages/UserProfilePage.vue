@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { Form, FormItem, Input } from 'ant-design-vue';
-import { onMounted, ref } from 'vue';
-import { getUserProfile } from '~/api/user';
 import type { Profile } from '~/types/user';
+import { onMounted, ref } from 'vue';
+import { Form, FormItem, Input } from 'ant-design-vue';
+import useStoreAuth from '~/stores/auth'
+import { getUserProfile } from '~/api/user';
 
-
+const authStore = useStoreAuth()
 
 type ProfileData = Pick<Profile, 'username' | 'email' | 'phoneNumber'>
 
@@ -14,7 +15,7 @@ const userData = ref<ProfileData>({
   phoneNumber: '',
 })
 
-const toRus: Record<keyof ProfileData, string> = {
+const ruProfileDataLabel: Record<keyof ProfileData, string> = {
   username: 'Имя пользователя:',
   email: 'Почтовый адрес:',
   phoneNumber: 'Телефон:'
@@ -40,13 +41,22 @@ onMounted(async () => {
 
 <template>
   <div class="user-profile-page">
+    <div class="header">
+      <RouterLink class="signout-link ant-btn"
+        :to="{name: 'signin'}"
+        @click="authStore.signout"
+      >
+        Выйти
+      </RouterLink>
+    </div>
+
     <Form class="user-profile"
       direction="vertical"
       :labelCol="{span: 9}"
     >
       <FormItem class="profile-record"
         name="username"
-        :label="toRus.username"
+        :label="ruProfileDataLabel.username"
       >
         <Input class="input"
           disabled
@@ -55,7 +65,7 @@ onMounted(async () => {
       </FormItem>
       <FormItem class="profile-record"
         name="email"
-        :label="toRus.email"
+        :label="ruProfileDataLabel.email"
       >
         <Input class="input"
           disabled
@@ -64,7 +74,7 @@ onMounted(async () => {
       </FormItem>
       <FormItem class="profile-record"
         name="phoneNumber"
-        :label="toRus.phoneNumber"
+        :label="ruProfileDataLabel.phoneNumber"
       >
         <Input class="input"
           disabled
@@ -87,6 +97,27 @@ onMounted(async () => {
 .label {
 }
 .data {
+}
+
+.header {
+  display: flex;
+  justify-content: end;
+  margin-bottom: 16px;
+}
+
+.signout-link {
+  font-size: 14px;
+  height: 32px;
+
+  padding: 4px 15px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+
+  &:hover {
+    color: #4096ff;
+    border-color: #4096ff;
+  }
 }
 
 
