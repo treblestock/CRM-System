@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { LayoutSider, Menu, MenuItem, } from 'ant-design-vue'
-import { CheckSquareOutlined, UserOutlined } from '@ant-design/icons-vue'
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router'
+import useStoreAuth from '~/stores/auth'
 
+import { LayoutSider, Menu, MenuItem, } from 'ant-design-vue'
+import Icon, { CheckSquareOutlined, UserOutlined } from '@ant-design/icons-vue'
+import ChartIcon from '~/components/icons/ChartIcon.vue'
+
+
+const authStore = useStoreAuth()
 
 type SidebarPageLink = 'todoList' | 'userProfile'
 const activeLinks = ref<SidebarPageLink[]>(['todoList'])
@@ -16,6 +21,8 @@ watch(
   },
   { immediate: true }
 )
+
+
 
 </script>
 
@@ -32,6 +39,14 @@ watch(
         <MenuItem class="nav-item" key="UserProfile">
           <RouterLink class="link" :to="{ name: 'userProfile' }">
             <UserOutlined /> Личный кабинет
+          </RouterLink>
+        </MenuItem>
+
+        <MenuItem class="nav-item" key="UserProfile"
+          v-if="authStore.isAdmin"
+        >
+          <RouterLink class="link" :to="{ name: 'users' }">
+            <ChartIcon /> Пользователи
           </RouterLink>
         </MenuItem>
 

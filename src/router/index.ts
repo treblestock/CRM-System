@@ -28,6 +28,15 @@ const routes = [
           isAuthOnly: true,
         },
         component: () => import('~/pages/UserProfilePage.vue'),
+      },
+      {
+        path: '/users',
+        name: 'users',
+        props: true,
+        meta: {
+          isAuthOnly: true,
+        },
+        component: () => import('~/pages/AdminUsersPage.vue'),
       }
     ],
   },

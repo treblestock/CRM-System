@@ -21,7 +21,6 @@ import AppSidebar from '~/components/AppSidebar.vue';
 
 <style scoped>
 .page {
-  max-width: 700px;
   margin: 0 auto;
 }
 
