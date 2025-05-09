@@ -1,0 +1,10 @@
+html {
+  /* fonts */
+  --font-primary: 'Nunito Sans';
+  /* colors */
+  --color-primary: #7F265B;
+  --color-sand: #FFE6C9;
+  --color-grey: #525252;
+  --color-grey-3: #828282;
+}
+
