@@ -1,3 +1,6 @@
+import type { ColumnType } from "ant-design-vue/es/table";
+
+// * Domain
 export interface UserFilters { 
   search?: string;
   sortBy?: string;
@@ -6,8 +9,6 @@ export interface UserFilters {
   limit?: number;
   offset?: number;
 }
-
-export type UsersTableFilterOption = 'all' | 'isBlocked' | 'isNotBlocked'
 
 // Интерфейс пользователя
 export interface User {
@@ -44,3 +45,15 @@ export interface UserRequest{
 }
 
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR'
+
+
+
+//* UI
+export type UsersTableSortOption = 'none' | 'username' | 'email'
+
+export type UsersTableFilterOption = 'all' | 'isBlocked' | 'isNotBlocked'
+export type UsersTableColumn = ColumnType & {
+  title: UsersTableColumnTitle
+  dataIndex: keyof User
+}
+export type UsersTableColumnTitle = 'Имя' | 'Email' | 'Телефон' | 'Роли' | 'Блокировка' | 'Дата регистрации'

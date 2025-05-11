@@ -24,7 +24,10 @@ import AppSidebar from '~/components/AppSidebar.vue';
   margin: 0 auto;
 }
 
-.content {}
+.content {
+  background: #fff;
+  padding: 32px;
+}
 
 .sidebar {
   background: none;

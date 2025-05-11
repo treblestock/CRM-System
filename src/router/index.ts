@@ -30,13 +30,24 @@ const routes = [
         component: () => import('~/pages/UserProfilePage.vue'),
       },
       {
+        path: '/users/:id',
+        name: 'adminUser',
+        props: (route) => ({ 
+          id: +route.params.id
+        }),
+        meta: {
+          isAuthOnly: true,
+        },
+        component: () => import('~/pages/AdminUserPage.vue'),
+      },
+      {
         path: '/users',
-        name: 'users',
+        name: 'adminUserList',
         props: true,
         meta: {
           isAuthOnly: true,
         },
-        component: () => import('~/pages/AdminUsersPage.vue'),
+        component: () => import('~/pages/AdminUserListPage.vue'),
       }
     ],
   },

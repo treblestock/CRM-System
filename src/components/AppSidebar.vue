@@ -45,7 +45,7 @@ watch(
         <MenuItem class="nav-item" key="UserProfile"
           v-if="authStore.isAdmin"
         >
-          <RouterLink class="link" :to="{ name: 'users' }">
+          <RouterLink class="link" :to="{ name: 'adminUserList' }">
             <ChartIcon /> Пользователи
           </RouterLink>
         </MenuItem>

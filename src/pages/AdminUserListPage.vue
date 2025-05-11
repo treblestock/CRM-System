@@ -2,20 +2,21 @@
 import { computed, ref, watch } from 'vue';
 import { getUsers } from '~/api/admin';
 import UsersTable from '~/components/UsersTable.vue';
-import type { User, UserFilters, UsersTableFilterOption } from '~/types/admin';
+import UsersTableToolbar from '~/components/UsersTableToolbar.vue';
+import type { User, UserFilters, UsersTableFilterOption, UsersTableSortOption } from '~/types/admin';
 
 
 const users = ref<User[]>([])
 
 const search = ref('')
-const filterByBlockOption = ref<UsersTableFilterOption>('all')
-const sortBy = ref<'none' | 'email' | 'username'>('none')
+const selectedFilter = ref<UsersTableFilterOption>('all')
+const sortBy = ref<UsersTableSortOption>('none')
 const sortOrder = ref<UserFilters['sortOrder']>('asc')
 const limit = ref(20)
 const offset = ref(0)
 
 const usersTotalCount = ref(0)
-const pages = computed(() => Math.ceil(usersTotalCount.value / limit.value) )
+const pagesCount = computed(() => Math.ceil(usersTotalCount.value / limit.value) )
 
 const userFilters = computed<UserFilters>(() => {
   const filters: UserFilters = {
@@ -25,8 +26,8 @@ const userFilters = computed<UserFilters>(() => {
   if (search.value) {
     filters.search = search.value
   }
-  if (filterByBlockOption.value !== 'all') {
-    filters.isBlocked = filterByBlockOption.value === 'isBlocked' ? true : false
+  if (selectedFilter.value !== 'all') {
+    filters.isBlocked = selectedFilter.value === 'isBlocked' ? true : false
   }
   if (sortBy.value !== 'none') {
     filters.sortBy = sortBy.value
@@ -36,12 +37,13 @@ const userFilters = computed<UserFilters>(() => {
   return filters
 })
 
+
 async function fetchUsers() {
   try {
     const resp = await getUsers(userFilters.value)
     
     if (resp.status === 200) {
-      users.value = resp.data.data
+      users.value = resp.data.data || []
       usersTotalCount.value = resp.data.meta.totalAmount
     }
   } catch(err) {
@@ -53,22 +55,50 @@ watch(userFilters, fetchUsers, {
   immediate: true
 })
 
+
 </script>
 
 <template>
   <div class="users">
     <div class="header">
       <h1 class="title">Пользователи</h1>
-      <!-- <UsersTableToolbar /> -->
+      <UsersTableToolbar class="users-table-toolbar"
+        v-model:search="search"
+        v-model:selectedFilter="selectedFilter"
+      />
     </div>
 
     <UsersTable class="users-table" 
       :users="users"
+      v-model:sortBy="sortBy"
+      v-model:sortOrder="sortOrder"
+      @updateUsers="fetchUsers"
     />
   </div>
 </template>
 
 <style scoped>
+.users {
+  font-family: 'Inter';
+
+  border: 1px solid #E4E4E4;
+  padding: 20px;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+
+  margin-bottom: 16px;
+}
+.title {
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 500;
+}
+.users-table {
+}
+
 
 
 </style>

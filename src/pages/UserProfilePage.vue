@@ -1,25 +1,18 @@
 <script setup lang="ts">
-import type { Profile } from '~/types/user';
+import type { ProfileData } from '~/types/user';
 import { onMounted, ref } from 'vue';
-import { Form, FormItem, Input } from 'ant-design-vue';
 import useStoreAuth from '~/stores/auth'
 import { getUserProfile } from '~/api/user';
+import UserProfileForm from '~/components/UserProfileForm.vue'
 
 const authStore = useStoreAuth()
 
-type ProfileData = Pick<Profile, 'username' | 'email' | 'phoneNumber'>
 
 const userData = ref<ProfileData>({
   username: '',
   email: '',
   phoneNumber: '',
 })
-
-const ruProfileDataLabel: Record<keyof ProfileData, string> = {
-  username: 'Имя пользователя:',
-  email: 'Почтовый адрес:',
-  phoneNumber: 'Телефон:'
-}
 
 onMounted(async () => {
   try {
@@ -50,53 +43,15 @@ onMounted(async () => {
       </RouterLink>
     </div>
 
-    <Form class="user-profile"
-      direction="vertical"
-      :labelCol="{span: 9}"
-    >
-      <FormItem class="profile-record"
-        name="username"
-        :label="ruProfileDataLabel.username"
-      >
-        <Input class="input"
-          disabled
-          v-model:value="userData.username"
-        />
-      </FormItem>
-      <FormItem class="profile-record"
-        name="email"
-        :label="ruProfileDataLabel.email"
-      >
-        <Input class="input"
-          disabled
-          v-model:value="userData.email"
-        />
-      </FormItem>
-      <FormItem class="profile-record"
-        name="phoneNumber"
-        :label="ruProfileDataLabel.phoneNumber"
-      >
-        <Input class="input"
-          disabled
-          v-model:value="userData.phoneNumber"
-        />
-      </FormItem>
-    </Form>
+    <UserProfileForm class="user-profile-form"
+      :userProfileData="userData"
+    />
   </div>
 </template>
 
 <style scoped>
 .user-profile-page {
   padding: 10px;
-}
-.user-profile {
-}
-.profile-record {
-  margin-bottom: 10px;
-}
-.label {
-}
-.data {
 }
 
 .header {
@@ -119,13 +74,4 @@ onMounted(async () => {
     border-color: #4096ff;
   }
 }
-
-
-:deep(.ant-input[disabled]) {
-  background: #fff;
-  color: inherit;
-  cursor: auto;
-}
-
-
 </style>

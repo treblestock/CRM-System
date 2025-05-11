@@ -41,3 +41,6 @@ export interface Token {
 }
 
 export type Role = 'ADMIN' | 'USER' | 'MODERATOR'
+
+
+export type ProfileData = Pick<Profile, 'username' | 'email' | 'phoneNumber'>
