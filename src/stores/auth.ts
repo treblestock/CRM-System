@@ -1,16 +1,19 @@
-import axios, { AxiosError, type AxiosResponse } from "axios"
+import axios, { type AxiosResponse } from "axios"
 import { defineStore } from "pinia"
 import { computed, ref } from "vue"
 import { refresh as apiRefresh, signin as apiSignin, signout as apiSignout, signup as apiSignup, getUserProfile } from "~/api/user"
 import type { AuthData, Profile, Token } from "~/types/user"
 import { axiosBase } from "~/api/base"
+import { useRouter } from "vue-router"
 
 
-export const REFRESH_TOKEN_KEY = 'refreshToken'
+const REFRESH_TOKEN_KEY = 'refreshToken'
 
 
 
 export default defineStore('auth', () => {
+  const router = useRouter()
+
   const isAuth = ref(false)
   const userProfile = ref<Profile | null>(null)
 
@@ -50,14 +53,12 @@ export default defineStore('auth', () => {
     isAuth.value = false
 
     userProfile.value = null
+    router.push({name: 'signin'})
   }
 
 
   async function refresh() {
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY)
-    if (!refreshToken) {
-      return new AxiosError("refresh token is missing", '401')
-    }
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY) || ''
 
     return apiRefresh({ refreshToken })
       .then(onSignin)
@@ -66,14 +67,15 @@ export default defineStore('auth', () => {
   axiosBase.interceptors.response.use(undefined,
     (error) => {
       const resp = error.response as AxiosResponse
-      if (!resp) {
+      const isAuthRespError = resp.status === 401
+
+      if (!resp || !isAuthRespError) {
         return error
       }
   
       const isAuthRequest = resp.config.url!.match(/\/auth\/(signin|refresh)$/)
-      const isAuthRespError = resp.status === 401
 
-      if (isAuthRequest || !isAuthRespError) {
+      if (isAuthRequest) {
         onSignout()
         return error
       }
@@ -82,8 +84,6 @@ export default defineStore('auth', () => {
         .then((refreshResp) => refreshResp.status === 200 ? axios(resp.config) : error)
     },
   )
-
-
 
 
   return {
