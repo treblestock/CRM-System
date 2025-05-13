@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Layout, LayoutContent } from 'ant-design-vue'
+import { ConfigProvider, Layout, LayoutContent } from 'ant-design-vue'
 import AppSidebar from '~/components/AppSidebar.vue';
 
 
@@ -7,9 +7,13 @@ import AppSidebar from '~/components/AppSidebar.vue';
 
 <template>
   <Layout class="page">
-    <LayoutContent class="content">
-      <RouterView />
-    </LayoutContent>
+    <ConfigProvider :theme="{
+      token: {colorPrimary: '#1677ff'}
+    }">
+      <LayoutContent class="content">
+        <RouterView />
+      </LayoutContent>
+    </ConfigProvider>
     
     <AppSidebar />
   </Layout>
@@ -17,11 +21,13 @@ import AppSidebar from '~/components/AppSidebar.vue';
 
 <style scoped>
 .page {
-  max-width: 700px;
   margin: 0 auto;
 }
 
-.content {}
+.content {
+  background: #fff;
+  padding: 32px;
+}
 
 .sidebar {
   background: none;
