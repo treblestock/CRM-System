@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { InputSearch } from 'ant-design-vue';
-import {ref, computed, watch} from 'vue'
 
 
 const props = defineProps<{
@@ -19,7 +18,7 @@ function handleUpdateSearch(search: string) {
 
 <template>
   <InputSearch class="user-search"
-    :value="search"
+    :value="props.search"
     @update:value="handleUpdateSearch"
     placeholder="Поиск по имени или email"
   />

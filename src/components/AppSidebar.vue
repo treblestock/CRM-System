@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import useStoreAuth from '~/stores/auth'
 
 import { LayoutSider, Menu, MenuItem, } from 'ant-design-vue'
-import Icon, { CheckSquareOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { CheckSquareOutlined, UserOutlined } from '@ant-design/icons-vue'
 import ChartIcon from '~/components/icons/ChartIcon.vue'
 
 

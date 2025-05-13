@@ -48,7 +48,7 @@ function handleChangeFilter(selectedFilter: UsersTableFilterOption) {
 <template>
   <Select class="users-filter"
     placeholder="foo"
-    :value="selectedFilter"
+    :value="props.selectedFilter"
     :options="options"
     @change="(handleChangeFilter as Function)"
   />

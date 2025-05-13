@@ -1,4 +1,4 @@
-import axios, { type AxiosResponse } from "axios"
+import { type AxiosResponse } from "axios"
 import { defineStore } from "pinia"
 import { computed, ref } from "vue"
 import { refresh as apiRefresh, signin as apiSignin, signout as apiSignout, signup as apiSignup, getUserProfile } from "~/api/user"
@@ -6,10 +6,7 @@ import type { AuthData, Profile, Token } from "~/types/user"
 import { axiosBase } from "~/api/base"
 import { useRouter } from "vue-router"
 
-
 const REFRESH_TOKEN_KEY = 'refreshToken'
-
-
 
 export default defineStore('auth', () => {
   const router = useRouter()
@@ -21,7 +18,7 @@ export default defineStore('auth', () => {
 
   const signup = apiSignup
 
-  function signin(authData: AuthData)  {
+  async function signin(authData: AuthData) {
     return apiSignin(authData)
       .then(onSignin)
   }
@@ -38,11 +35,12 @@ export default defineStore('auth', () => {
         .then((resp) => userProfile.value = resp.data )
         .catch(console.log)
     }
+    
     return resp
   }
 
 
-  function signout() {
+  async function signout() {
     return apiSignout()
       .then(onSignout)
   }
@@ -67,7 +65,7 @@ export default defineStore('auth', () => {
   axiosBase.interceptors.response.use(undefined,
     (error) => {
       const resp = error.response as AxiosResponse
-      const isAuthRespError = resp.status === 401
+      const isAuthRespError = resp?.status === 401
 
       if (!resp || !isAuthRespError) {
         return error
@@ -81,7 +79,10 @@ export default defineStore('auth', () => {
       }
       
       return refresh()
-        .then((refreshResp) => refreshResp.status === 200 ? axios(resp.config) : error)
+        .then((refreshResp) => refreshResp.status === 200 ? axiosBase({
+          ...resp.config,
+          headers: {Authorization: 'Bearer ' + refreshResp.data.accessToken}
+        }) : error)
     },
   )
 

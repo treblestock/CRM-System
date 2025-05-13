@@ -8,22 +8,25 @@ import UserProfileForm from '~/components/UserProfileForm.vue'
 const authStore = useStoreAuth()
 
 
-const userData = ref<ProfileData>({
+const userProfile = ref<ProfileData>({
   username: '',
   email: '',
   phoneNumber: '',
 })
+const isProfileLoaded = ref(false)
 
 onMounted(async () => {
   try {
     const resp = await getUserProfile()
 
     if (resp.status === 200) {
-      userData.value = {
+      userProfile.value = {
         username: resp.data.username,
         email: resp.data.email,
         phoneNumber: resp.data.phoneNumber,
       }
+      
+      isProfileLoaded.value = true
     }
   } catch(err) {
     console.log('err: ', err)
@@ -44,7 +47,9 @@ onMounted(async () => {
     </div>
 
     <UserProfileForm class="user-profile-form"
-      :userProfileData="userData"
+      v-if="isProfileLoaded"
+      :userProfileData="userProfile"
+      disabled
     />
   </div>
 </template>
@@ -60,18 +65,4 @@ onMounted(async () => {
   margin-bottom: 16px;
 }
 
-.signout-link {
-  font-size: 14px;
-  height: 32px;
-
-  padding: 4px 15px;
-  border-radius: 6px;
-  background-color: #ffffff;
-  border: 1px solid #d9d9d9;
-
-  &:hover {
-    color: #4096ff;
-    border-color: #4096ff;
-  }
-}
 </style>

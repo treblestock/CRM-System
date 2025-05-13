@@ -9,14 +9,11 @@ export const getUsers = (filters?: UserFilters): Promise<AxiosResponse<MetaRespo
 export const getUser = (id: User['id']): Promise<AxiosResponse<User> > => 
   axiosBase.get(`admin/users/${id}`)
 
-export const updateUser = ({id, patch}: {
-  id: User['id']
-  patch: UserRequest
-}): Promise<AxiosResponse<User> > => 
+  export const updateUser = (id: User['id'], patch: UserRequest): Promise<AxiosResponse<User> > => 
   axiosBase.put(`admin/users/${id}`, patch)
 
-export const setUserRoles = ({id, roles}: Pick<User, 'id'> & UserRolesRequest): Promise<AxiosResponse<User> > => 
-  axiosBase.put(`admin/users/${id}/rights`, roles)
+export const setUserRoles = (id: User['id'], roles: UserRolesRequest): Promise<AxiosResponse<User> > => 
+  axiosBase.post(`admin/users/${id}/rights`, roles)
 
 export const blockUser = (id: User['id']): Promise<AxiosResponse<User> > => 
   axiosBase.post(`admin/users/${id}/block`)

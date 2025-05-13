@@ -54,10 +54,7 @@ async function handleToggleAdmin() {
       ? props.user.roles.filter(role => role !== 'ADMIN')
       : [...props.user.roles, 'ADMIN']
 
-    const resp = await setUserRoles({
-      id: props.user.id,
-      roles,
-    })
+    const resp = await setUserRoles(props.user.id, {roles})
 
     if (resp.status === 200) {
       emit('updateUsers')
@@ -102,6 +99,8 @@ async function handelDeleteUser() {
     </Button>
     <Button class="delete-user-action"
       @click="handelDeleteUser"
+      type="primary"
+      danger
     >
       удалить
     </Button>

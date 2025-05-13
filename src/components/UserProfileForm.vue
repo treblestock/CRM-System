@@ -7,10 +7,12 @@ import { emailValidationRule, phoneNumberValidationRule, usernameValidationRule 
 
 const props = defineProps<{
   userProfileData: ProfileData
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
   submit: [updatedUserProfile: ProfileData]
+  cancel: []
 }>()
 
 const formState = ref<ProfileData>({ ...props.userProfileData })
@@ -18,7 +20,7 @@ const formState = ref<ProfileData>({ ...props.userProfileData })
 const ruProfileDataLabel: Record<keyof ProfileData, string> = {
   username: 'Имя пользователя:',
   email: 'Почтовый адрес:',
-  phoneNumber: 'Телефон:'
+  phoneNumber: 'Телефон:',
 }
 
 const rules = ref<Partial<Record<keyof ProfileData, RuleObject[] | RuleObject >> >({
@@ -26,6 +28,7 @@ const rules = ref<Partial<Record<keyof ProfileData, RuleObject[] | RuleObject >>
   email: emailValidationRule,
   phoneNumber: phoneNumberValidationRule,
 })
+
 
 function submit(userProfile: ProfileData) {
   const updatedValues: Partial<ProfileData> = userProfile
@@ -39,10 +42,10 @@ function submit(userProfile: ProfileData) {
     delete updatedValues.phoneNumber
   }
 
-  if (!Object.keys(updatedValues) ) {
-    return
+  if (!Object.keys(updatedValues).length ) {
+    return emit('cancel')
   }
-
+  
   emit('submit', updatedValues as ProfileData)
 }
 </script>
@@ -61,6 +64,7 @@ function submit(userProfile: ProfileData) {
     >
       <Input class="input"
         v-model:value="formState.username"
+        :disabled="disabled"
       />
     </FormItem>
     <FormItem class="profile-record"
@@ -69,6 +73,7 @@ function submit(userProfile: ProfileData) {
     >
       <Input class="input"
         v-model:value="formState.email"
+        :disabled="disabled"
       />
     </FormItem>
     <FormItem class="profile-record"
@@ -77,6 +82,7 @@ function submit(userProfile: ProfileData) {
     >
       <Input class="input"
         v-model:value="formState.phoneNumber"
+        :disabled="disabled"
       />
     </FormItem>
   </Form>

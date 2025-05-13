@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Form, FormItem } from 'ant-design-vue';
-import {ref, computed, watch} from 'vue'
-import type { UserFilters, UsersTableFilterOption } from '~/types/admin';
+import type { UsersTableFilterOption } from '~/types/admin';
 import UsersSearch from './UsersSearch.vue';
 import UsersFilter from './UsersFilter.vue';
 
@@ -30,7 +29,7 @@ function handleUpdateFilter(selectedFilter: UsersTableFilterOption) {
     <Form class="search-form">
       <FormItem class="search-form-item">
         <UsersSearch 
-          :search="search"
+          :search="props.search"
           @search="handleUpdateSearch"
         />
       </FormItem>

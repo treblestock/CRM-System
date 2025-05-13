@@ -5,6 +5,7 @@ import { Table, Tag } from 'ant-design-vue';
 import type { ColumnType } from 'ant-design-vue/es/table';
 import UserActionsToolbar from './UserActionsToolbar.vue';
 import type { SorterResult, SortOrder, TableCurrentDataSource } from 'ant-design-vue/es/table/interface';
+import { MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons-vue';
 
 
 const props = defineProps<{
@@ -19,8 +20,7 @@ const emit = defineEmits<{
   'updateUsers': []
 }>()
 
-
-
+// Table layout
 const ruTableColumnLabel = {
   username: 'Имя',
   email: 'Email',
@@ -29,7 +29,6 @@ const ruTableColumnLabel = {
   isBlocked: 'Блокировка',
   date: 'Дата регистрации',
 } as const satisfies Partial<Record<keyof User, UsersTableColumnTitle>>
-
 
 const tableColumns: (UsersTableColumn | ColumnType)[] = [
   {
@@ -69,13 +68,13 @@ const tableColumns: (UsersTableColumn | ColumnType)[] = [
   },
 ]
 
-
 const tagColors: Record<User['roles'][number], string> = {
   MODERATOR: '#D28E3D',
   ADMIN: '#4976F4',
   USER: '#F4EDF7',
 }
 
+//* Sort
 const sortMapper: Record<NonNullable<SortOrder>, UserFilters['sortOrder']> = {
   ascend: 'asc',
   descend: 'desc'
@@ -107,9 +106,10 @@ function handleUpdateUsers() {
     <Table class="table"
       :columns="tableColumns"
       :dataSource="props.users"
-      :scroll="{ x: true}"
+      :scroll="{ x: true }"
       rowClassName="user-record"
       @change="handleChangeFilters"
+      :pagination="false"
     > 
       <template #bodyCell="{column, record: user}">
           <RouterLink class="user-profile-page-link"
@@ -119,22 +119,19 @@ function handleUpdateUsers() {
               params: { id: (user as User).id }
             }"
           >
+            <UserOutlined />
             {{ (user as User).username }}
           </RouterLink>
           <span class="user-email"
             v-else-if="(column as UsersTableColumn).dataIndex === 'email'"
           > 
-            <!-- <Icon> 
-              <MailOutlined></MailOutlined>
-            </Icon> -->
+            <MailOutlined />
             {{ (user as User).email }}
           </span>
           <span class="user-phone"
             v-else-if="(column as UsersTableColumn).dataIndex === 'phoneNumber'"
           > 
-            <!-- <Icon> 
-              <PhoneOutlined></PhoneOutlined>
-            </Icon> -->
+            <PhoneOutlined />
             {{ (user as User).phoneNumber }}
           </span>
           <span class="user-roles"
@@ -173,16 +170,26 @@ function handleUpdateUsers() {
 @import "~css/consts";
 
 .table-wrapper {
-  
+  overflow: hidden;
 }
 
 .table {
   font-size: 14px;
   line-height: 1.5;
 
+  :deep(& .ant-table-content) {
+    padding-right: 10px;
+    max-height: 70vh;
+    overflow: auto !important;
+  }
+
   :deep(& table) {
     border-spacing: 0 12px;
   }
+}
+
+:deep(.ant-table-cell) {
+  text-wrap: nowrap;
 }
 
 :deep(.user-record) {
@@ -191,6 +198,10 @@ function handleUpdateUsers() {
 
 .user-profile-page-link {
   color: #000;
+
+  &:hover {
+    color: var(--color-primary);
+  }
 }
 .user-email {
   font-weight: 500;
@@ -203,7 +214,6 @@ function handleUpdateUsers() {
 }
 
 .user-roles {
-
   display: inline-flex;
   gap: 10px;
 }

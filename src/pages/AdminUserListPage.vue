@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import { Pagination } from 'ant-design-vue';
 import { computed, ref, watch } from 'vue';
 import { getUsers } from '~/api/admin';
 import UsersTable from '~/components/UsersTable.vue';
 import UsersTableToolbar from '~/components/UsersTableToolbar.vue';
+import useDebouncedRef from '~/composables/useDebouncedRef';
 import type { User, UserFilters, UsersTableFilterOption, UsersTableSortOption } from '~/types/admin';
 
 
 const users = ref<User[]>([])
 
-const search = ref('')
+const search = useDebouncedRef('', 500)
 const selectedFilter = ref<UsersTableFilterOption>('all')
 const sortBy = ref<UsersTableSortOption>('none')
 const sortOrder = ref<UserFilters['sortOrder']>('asc')
@@ -16,7 +18,10 @@ const limit = ref(20)
 const offset = ref(0)
 
 const usersTotalCount = ref(0)
-const pagesCount = computed(() => Math.ceil(usersTotalCount.value / limit.value) )
+const currentPage = computed({
+  get: () => offset.value + 1,
+  set: (value) => offset.value = value - 1,
+})
 
 const userFilters = computed<UserFilters>(() => {
   const filters: UserFilters = {
@@ -54,8 +59,6 @@ async function fetchUsers() {
 watch(userFilters, fetchUsers, {  
   immediate: true
 })
-
-
 </script>
 
 <template>
@@ -73,6 +76,12 @@ watch(userFilters, fetchUsers, {
       v-model:sortBy="sortBy"
       v-model:sortOrder="sortOrder"
       @updateUsers="fetchUsers"
+    />
+    <Pagination class="pagination"
+      :total="usersTotalCount"
+      :pageSize="limit"
+      v-model:current="currentPage"
+      hideOnSinglePage
     />
   </div>
 </template>
@@ -97,6 +106,10 @@ watch(userFilters, fetchUsers, {
   font-weight: 500;
 }
 .users-table {
+  margin-bottom: 20px;
+}
+.pagination {
+  text-align: right;
 }
 
 
