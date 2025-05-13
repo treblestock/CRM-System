@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref, computed, watch} from 'vue'
+import { ref } from 'vue'
 import { Form, FormItem, Input } from 'ant-design-vue';
 import type { ProfileData } from '~/types/user';
 import type { RuleObject } from 'ant-design-vue/es/form';
