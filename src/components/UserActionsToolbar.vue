@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { Button } from 'ant-design-vue';
+import { DownOutlined } from '@ant-design/icons-vue';
+import { Button, Dropdown, Menu, type ItemType } from 'ant-design-vue';
+import type { MenuInfo, MenuItemType } from 'ant-design-vue/es/menu/src/interface';
+import { computed } from 'vue';
 import { blockUser, deleteUser, setUserRoles, unblockUser } from '~/api/admin';
 import type { User } from '~/types/admin';
 import type { Role } from '~/types/user';
@@ -13,7 +16,7 @@ const emit = defineEmits<{
   updateUsers: []
 }>()
 
-
+//* Block 
 async function handleToggleBlock() {
   try {
     const confirmMsg = props.user.isBlocked 
@@ -38,11 +41,40 @@ async function handleToggleBlock() {
   }
 }
 
-async function handleToggleAdmin() {
+//* Roles
+const ruRoleLabel: Record<Role, string> = {
+  ADMIN: 'админ',
+  MODERATOR: 'модератор',
+  USER: 'пользователь',
+}
+
+const rolesMenuOptions = computed<ItemType[]>(() => {
+  const rolesToManage: Role[] = ['ADMIN', 'MODERATOR', 'USER']
+
+  return rolesToManage.map(role => {
+    return {
+      key: role,
+      label: `${props.user.roles.includes(role) ? '-' : '+'} ${ruRoleLabel[role]}`,
+    } as MenuItemType
+  })
+})
+
+
+async function handleRoleChange(item: MenuInfo) {
   try {
-    const confirmMsg = props.user.roles.includes('ADMIN') 
-      ? 'Вы уверены, что хотите лишить админства пользователя: ' + props.user.username
-      : 'Вы уверены, что хотите сделать пользователя: ' + props.user.username
+    const selectedRole = item.key as Role
+    const actualRoles = props.user.roles
+    const hasRole = actualRoles.includes(selectedRole)
+
+    const updatedRoles: Role[] = hasRole
+      ? actualRoles.filter(role => role !== selectedRole)
+      : [...actualRoles, selectedRole]
+    
+    const confirmMsgAction = hasRole 
+      ? `лишить роли "${ruRoleLabel[selectedRole]}" пользователя: ` 
+      : `добавить роль "${ruRoleLabel[selectedRole]}" пользователю: `
+    const confirmMsg = `Вы уверены, что хотите ${confirmMsgAction} ${props.user.username}`
+
 
     const confirmDelete = confirm(confirmMsg)
 
@@ -50,11 +82,7 @@ async function handleToggleAdmin() {
       return 
     }
 
-    const roles: Role[] = props.user.roles.includes('ADMIN') 
-      ? props.user.roles.filter(role => role !== 'ADMIN')
-      : [...props.user.roles, 'ADMIN']
-
-    const resp = await setUserRoles(props.user.id, {roles})
+    const resp = await setUserRoles(props.user.id, {roles: updatedRoles})
 
     if (resp.status === 200) {
       emit('updateUsers')
@@ -64,6 +92,8 @@ async function handleToggleAdmin() {
   }
 }
 
+
+//* Delete
 async function handelDeleteUser() {
   try {
     const confirmDelete = confirm('Вы уверены, что хотите удалить пользователя: ' + props.user.username)
@@ -83,6 +113,8 @@ async function handelDeleteUser() {
 }
 
 
+
+
 </script>
 
 <template>
@@ -92,11 +124,22 @@ async function handelDeleteUser() {
     >
       {{ user.isBlocked ? 'разблокировать' : 'заблокировать' }}
     </Button>
-    <Button class="toggle-block-action"
-      @click="handleToggleAdmin"
-    >
-      {{ user.roles.includes('ADMIN') ? 'лишить админства' : 'сделать админом'}}
-    </Button>
+
+    <Dropdown class="roles-toolbar">
+      <template #default>
+        <Button class="roles-toolbar-btn">
+          Роли
+          <DownOutlined />
+        </Button>
+      </template>
+
+      <template #overlay>
+        <Menu class="roles-toolbar-roles-menu"
+          :items="rolesMenuOptions"
+          @click="handleRoleChange"
+        />
+      </template>
+    </Dropdown>
     <Button class="delete-user-action"
       @click="handelDeleteUser"
       type="primary"
