@@ -5,8 +5,8 @@ import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router'
 
 
-type SidebarPageLink = 'TodoList' | 'UserProfile'
-const activeLinks = ref<SidebarPageLink[]>(['TodoList'])
+type SidebarPageLink = 'todoList' | 'userProfile'
+const activeLinks = ref<SidebarPageLink[]>(['todoList'])
 
 const route = useRoute()
 watch(
@@ -24,15 +24,15 @@ watch(
     <nav>
       <Menu v-model:selectedKeys="activeLinks">
         <MenuItem class="nav-item" key="TodoList">
-        <RouterLink class="link" :to="{ name: 'TodoList' }">
-          <CheckSquareOutlined /> список задач
-        </RouterLink>
+          <RouterLink class="link" :to="{ name: 'todoList' }">
+            <CheckSquareOutlined /> Список задач
+          </RouterLink>
         </MenuItem>
 
         <MenuItem class="nav-item" key="UserProfile">
-        <RouterLink class="link" :to="{ name: 'UserProfile' }">
-          <UserOutlined /> профиль
-        </RouterLink>
+          <RouterLink class="link" :to="{ name: 'userProfile' }">
+            <UserOutlined /> Личный кабинет
+          </RouterLink>
         </MenuItem>
 
       </Menu>
