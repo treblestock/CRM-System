@@ -49,12 +49,12 @@ const routes = [
       },
       {
         path: '/users',
-        name: 'adminUserList',
+        name: 'adminUsersList',
         props: true,
         meta: {
           isAuthOnly: true,
         },
-        component: () => import('~/pages/AdminUserListPage.vue'),
+        component: () => import('~/pages/AdminUsersListPage.vue'),
       }
     ],
   },

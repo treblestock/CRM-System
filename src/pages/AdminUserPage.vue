@@ -55,7 +55,7 @@ onMounted(fetchUserData)
 <template>
   <div class="user-profile-page">
     <RouterLink class="back-to-user-list-link ant-btn"
-      :to="{name: 'adminUserList'}"
+      :to="{name: 'adminUsersList'}"
     >
       Назад к списку пользователей
     </RouterLink>
