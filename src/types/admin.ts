@@ -23,7 +23,7 @@ export interface User {
 // Интерфейс метаинформации
 
 export interface MetaResponse<T> { 
-  data: T[]
+  data: T[] | null
   meta: {   
     totalAmount: number;   
     sortBy: string;   

@@ -48,6 +48,12 @@ async function fetchUsers() {
     const resp = await getUsers(userFilters.value)
     
     if (resp.status === 200) {
+      if (!resp.data.data && offset.value > 0) {
+        const lastPageOffset = Math.floor((resp.data.meta.totalAmount - 1) / limit.value)
+        offset.value = lastPageOffset
+        return
+      }
+
       users.value = resp.data.data || []
       usersTotalCount.value = resp.data.meta.totalAmount
     }

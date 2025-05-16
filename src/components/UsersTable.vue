@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { User, UserFilters, UsersTableColumn, UsersTableColumnTitle, UsersTableSortOption } from '~/types/admin';
-// import UserRecord from './UserRecord.vue';
 import { Table, Tag } from 'ant-design-vue';
 import type { ColumnType } from 'ant-design-vue/es/table';
 import UserActionsToolbar from './UserActionsToolbar.vue';
@@ -102,65 +101,64 @@ function handleUpdateUsers() {
 
 <template>
   <div class="table-wrapper">
-    <!-- @vue-ignore -->
     <Table class="table"
       :columns="tableColumns"
       :dataSource="props.users"
       :scroll="{ x: true }"
       rowClassName="user-record"
-      @change="handleChangeFilters"
+      @change="(handleChangeFilters as () => void)"
       :pagination="false"
     > 
       <template #bodyCell="{column, record: user}">
-          <RouterLink class="user-profile-page-link"
-            v-if="(column as UsersTableColumn).dataIndex === 'username'"
-            :to="{ 
-              name: 'adminUser',
-              params: { id: (user as User).id }
-            }"
+        <RouterLink class="user-profile-page-link"
+          v-if="(column as UsersTableColumn).dataIndex === 'username'"
+          :to="{ 
+            name: 'adminUser',
+            params: { id: (user as User).id }
+          }"
+        >
+          <UserOutlined />
+          {{ (user as User).username }}
+        </RouterLink>
+        <span class="user-email"
+          v-else-if="(column as UsersTableColumn).dataIndex === 'email'"
+        > 
+          <MailOutlined />
+          {{ (user as User).email }}
+        </span>
+        <span class="user-phone"
+          v-else-if="(column as UsersTableColumn).dataIndex === 'phoneNumber'"
+        > 
+          <PhoneOutlined />
+          {{ (user as User).phoneNumber }}
+        </span>
+        <span class="user-roles"
+          v-else-if="(column as UsersTableColumn).dataIndex === 'roles'"
+        > 
+          <Tag class="user-role"
+            v-for="role in (user as User).roles" :key="role"
+            :class="`user-role-${role.toLowerCase()}`"
+            :color="tagColors[role] || 'geekblue'"
           >
-            <UserOutlined />
-            {{ (user as User).username }}
-          </RouterLink>
-          <span class="user-email"
-            v-else-if="(column as UsersTableColumn).dataIndex === 'email'"
-          > 
-            <MailOutlined />
-            {{ (user as User).email }}
-          </span>
-          <span class="user-phone"
-            v-else-if="(column as UsersTableColumn).dataIndex === 'phoneNumber'"
-          > 
-            <PhoneOutlined />
-            {{ (user as User).phoneNumber }}
-          </span>
-          <span class="user-roles"
-            v-else-if="(column as UsersTableColumn).dataIndex === 'roles'"
-          > 
-            <Tag class="user-role"
-              v-for="role in (user as User).roles" :key="role"
-              :class="`user-role-${role.toLowerCase()}`"
-              :color="tagColors[role] || 'geekblue'"
-            >
-              {{ role }}
-            </Tag>
-          </span>
-          <span class="user-block-status"
-            v-else-if="(column as UsersTableColumn).dataIndex === 'isBlocked'"
-          > 
-            {{ (user as User).isBlocked ? '+' : '-' }}
-          </span>
-          <span class="user-signup-date"
-            v-else-if="(column as UsersTableColumn).dataIndex === 'date'"
-          > 
-            {{ new Date((user as User).date).toLocaleDateString('ru-RU') }}
-          </span>
-          <span v-else-if="column.key === 'actionToolbar'">
-            <UserActionsToolbar class="user-action-toolbar"
-              :user="(user as User)"
-              @updateUsers="handleUpdateUsers"
-            />
-          </span>
+            {{ role }}
+          </Tag>
+        </span>
+        <span class="user-block-status"
+          v-else-if="(column as UsersTableColumn).dataIndex === 'isBlocked'"
+        > 
+          {{ (user as User).isBlocked ? '+' : '-' }}
+        </span>
+        <span class="user-signup-date"
+          v-else-if="(column as UsersTableColumn).dataIndex === 'date'"
+        > 
+          {{ new Date((user as User).date).toLocaleDateString('ru-RU') }}
+        </span>
+        <span v-else-if="column.key === 'actionToolbar'">
+          <UserActionsToolbar class="user-action-toolbar"
+            :user="(user as User)"
+            @updateUsers="handleUpdateUsers"
+          />
+        </span>
       </template>
     </Table>
   </div>
