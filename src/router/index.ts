@@ -1,7 +1,14 @@
+import type { RouteLocationNormalizedGeneric } from "vue-router"
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
-import authMiddleware from '~/middleware/auth'
 
+import useStoreAuth from '~/stores/auth'
 
+declare module 'vue-router' {
+  export interface RouteMeta {
+    isAuthOnly?: boolean
+    isAdminOnly?: boolean
+  }
+}
 
 const routes = [
   {
@@ -78,6 +85,23 @@ const router = createRouter({
   routes,
   history: createWebHistory(),
 })
+
+
+async function authMiddleware(to: RouteLocationNormalizedGeneric) {
+  const authStore = useStoreAuth()
+  
+  if ((to.meta.isAuthOnly || to.meta.isAdminOnly) && !authStore.isAuth) {
+    const resp = await authStore.refresh()
+    
+    if (resp.status !== 200) {
+      return {name: 'signin'}
+    }
+  }
+
+  if (to.meta.isAdminOnly && !authStore.isAdmin) {
+    return {name: 'main'}
+  }
+}
 
 router.beforeEach(authMiddleware)
 
