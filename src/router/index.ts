@@ -52,7 +52,7 @@ const routes = [
         name: 'adminUsersList',
         props: true,
         meta: {
-          isAuthOnly: true,
+          isAdminOnly: true,
         },
         component: () => import('~/pages/AdminUsersListPage.vue'),
       }
