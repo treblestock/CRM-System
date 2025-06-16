@@ -1,23 +1,24 @@
-import axios, { type AxiosResponse } from "axios"
+import { type AxiosResponse } from "axios"
 import { defineStore } from "pinia"
-import { ref } from "vue"
+import { computed, ref } from "vue"
+import { refresh as apiRefresh, signin as apiSignin, signout as apiSignout, signup as apiSignup, getUserProfile } from "~/api/user"
+import type { AuthData, Profile, Token } from "~/types/user"
+import { axiosBase } from "~/api/base"
 import { useRouter } from "vue-router"
-import { axiosUser, refresh as apiRefresh, signin as apiSignin, signout as apiSignout, signup as apiSignup } from "~/api/user"
-import type { AuthData, Token } from "~/types/user"
-
 
 const REFRESH_TOKEN_KEY = 'refreshToken'
-
-
 
 export default defineStore('auth', () => {
   const router = useRouter()
 
   const isAuth = ref(false)
+  const userProfile = ref<Profile | null>(null)
+
+  const isAdmin = computed(() => userProfile.value?.roles.includes('ADMIN') )
 
   const signup = apiSignup
 
-  function signin(authData: AuthData)  {
+  async function signin(authData: AuthData) {
     return apiSignin(authData)
       .then(onSignin)
   }
@@ -26,23 +27,30 @@ export default defineStore('auth', () => {
     if (resp.status === 200) {
       const {accessToken, refreshToken} = resp.data
     
-      axiosUser.defaults.headers.common.Authorization = `Bearer ${accessToken}` 
+      axiosBase.defaults.headers.common.Authorization = `Bearer ${accessToken}` 
       localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken)
       isAuth.value = true
-    } 
+
+      getUserProfile()
+        .then((resp) => userProfile.value = resp.data )
+        .catch(console.log)
+    }
     
     return resp
   }
 
-  function signout() {
+
+  async function signout() {
     return apiSignout()
       .then(onSignout)
   }
   
   function onSignout() {
-    delete axiosUser.defaults.headers.common.Authorization
+    delete axiosBase.defaults.headers.common.Authorization
     localStorage.removeItem(REFRESH_TOKEN_KEY)
     isAuth.value = false
+
+    userProfile.value = null
     router.push({name: 'signin'})
   }
 
@@ -54,10 +62,10 @@ export default defineStore('auth', () => {
       .then(onSignin)
   }
 
-  axiosUser.interceptors.response.use(undefined,
+  axiosBase.interceptors.response.use(undefined,
     (error) => {
       const resp = error.response as AxiosResponse
-      const isAuthRespError = resp.status === 401
+      const isAuthRespError = resp?.status === 401
 
       if (!resp || !isAuthRespError) {
         return error
@@ -71,13 +79,19 @@ export default defineStore('auth', () => {
       }
       
       return refresh()
-        .then((refreshResp) => refreshResp.status === 200 ? axios(resp.config) : error)
+        .then((refreshResp) => refreshResp.status === 200 ? axiosBase({
+          ...resp.config,
+          headers: {Authorization: 'Bearer ' + refreshResp.data.accessToken}
+        }) : error)
     },
   )
 
 
   return {
     isAuth,
+    userProfile,
+    isAdmin,
+
     signup,
     signin,
     refresh,

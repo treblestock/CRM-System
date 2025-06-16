@@ -3,6 +3,12 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router"
 
 import useStoreAuth from '~/stores/auth'
 
+declare module 'vue-router' {
+  export interface RouteMeta {
+    isAuthOnly?: boolean
+    isAdminOnly?: boolean
+  }
+}
 
 const routes = [
   {
@@ -29,6 +35,26 @@ const routes = [
           isAuthOnly: true,
         },
         component: () => import('~/pages/UserProfilePage.vue'),
+      },
+      {
+        path: '/users/:id',
+        name: 'adminUser',
+        props: (route) => ({ 
+          id: +route.params.id
+        }),
+        meta: {
+          isAuthOnly: true,
+        },
+        component: () => import('~/pages/AdminUserPage.vue'),
+      },
+      {
+        path: '/users',
+        name: 'adminUsersList',
+        props: true,
+        meta: {
+          isAdminOnly: true,
+        },
+        component: () => import('~/pages/AdminUsersListPage.vue'),
       }
     ],
   },
@@ -64,12 +90,16 @@ const router = createRouter({
 async function authMiddleware(to: RouteLocationNormalizedGeneric) {
   const authStore = useStoreAuth()
   
-  if (to.meta.isAuthOnly && !authStore.isAuth) {
+  if ((to.meta.isAuthOnly || to.meta.isAdminOnly) && !authStore.isAuth) {
     const resp = await authStore.refresh()
     
     if (resp.status !== 200) {
       return {name: 'signin'}
     }
+  }
+
+  if (to.meta.isAdminOnly && !authStore.isAdmin) {
+    return {name: 'main'}
   }
 }
 

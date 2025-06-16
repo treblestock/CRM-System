@@ -14,6 +14,7 @@
 @import '~css/reset.css';
 @import '~css/consts.css';
 @import '~css/fonts.css';
+@import '~css/global.css';
 
 .app {
   font-family: var(--font-primary);
